@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "training-song"
+version = "0.1.0"
+description = "Plays a Billboard Number 1 song corresponding to how accurate your ML model is"
+authors = ["koayon <koayon@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "training_song"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.1"
+lyricsgenius = "^3.0.1"
+spotipy = "^2.23.0"
+billboard-py = "^7.0.0"
+uvicorn = "^0.22.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
