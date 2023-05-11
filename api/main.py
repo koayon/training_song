@@ -5,10 +5,11 @@ the song that was number 1 on the Billboard Hot 100 on that day.
 
 import datetime
 import json
-from typing import Tuple
+from typing import Tuple, Union
 from urllib.error import HTTPError
 
 import billboard
+from fastapi import FastAPI, HTTPException
 import lyricsgenius
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -34,6 +35,7 @@ def main(percentage: float, chart: str = "hot-100", autoplay: bool = True):
         f"The date was {target_date} and the song was on the chart for {number_one_song.weeks} weeks."
     )
     print(datetime.datetime.now())
+
     try:
         sp = authenticate_spotify()
     except HTTPError:
@@ -41,14 +43,15 @@ def main(percentage: float, chart: str = "hot-100", autoplay: bool = True):
             "Please ensure that Spotify is open on your device and you are logged in."
         )
         print("It may help to play a song on Spotify before trying again.")
-        return
+        raise HTTPException(status_code=500, detail="Spotify authentication failed")
 
     # devices = sp.devices()
     # device_list = devices['devices']
 
     link, name, uri = spotify_link(sp, song_name, artist_name)
 
-    print(f"Here's a link to the song {name} on Spotify {link}")
+    print(f"Here's a link to the song {name} on Spotify")
+    print(link)
 
     # Throw print statements into function calls to clean this up
 
@@ -143,9 +146,14 @@ def start_playing_on_spotify(sp, uri, device_id=None):
     sp.start_playback(device_id=device_id, uris=[uri])
 
 
-if __name__ == "__main__":
-    input_percentage = float(
-        input("How well did your model do? (Enter a percentage): ")
-    )
-    print()
-    main(input_percentage)
+app = FastAPI()
+
+
+@app.get("/")
+async def root(p: float, chart: str = "hot-100", autoplay: bool = True):
+    try:
+        main(p, chart, autoplay)
+        return {"percentage": p, "chart": chart, "autoplay": autoplay}
+    except Exception:
+        return {"error": "Yo"}
+        # raise HTTPException(status_code=500, detail=e)
