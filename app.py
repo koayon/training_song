@@ -1,6 +1,5 @@
 """
-This is the app file which defines the api. It takes in a percentage and returns
-the song that was number 1 on the Billboard Hot 100 on that day.
+A version that you can run locally for testing.
 """
 
 import datetime
@@ -55,8 +54,14 @@ def main(percentage: float, chart: str = "hot-100", autoplay: bool = True):
     # Spotify describes the song as belonging to these genres:
 
     # Genius song description:
-
-    start_playing_on_spotify(sp, uri)
+    try:
+        start_playing_on_spotify(sp, uri)
+    except HTTPError:
+        print(
+            "Please ensure that Spotify is open on your device and you are logged in."
+        )
+        print("It may help to play a song on Spotify before trying again.")
+        return
 
 
 def authenticate_spotify():

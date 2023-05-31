@@ -1,2 +1,6 @@
 spotify_credentials.json
 .cache
+.vercel
+.space
+.env
+env_vars.py

@@ -1,21 +1,34 @@
 """
-This is the app file which defines the api. It takes in a percentage and returns
+The main API. It takes in a percentage and returns
 the song that was number 1 on the Billboard Hot 100 on that day.
 """
 
 import datetime
 import json
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 from urllib.error import HTTPError
+import logging
+import os
+from dataclasses import dataclass
 
 import billboard
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 import lyricsgenius
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from env_vars import CLIENT_ID, CLIENT_SECRET
 
 
-def main(percentage: float, chart: str = "hot-100", autoplay: bool = True):
+@dataclass
+class Song:
+    artist: str
+    weeks: int
+    title: str
+
+
+def main(percentage: float, chart: str = "hot-100", autoplay: bool = True) -> None:
     if percentage > 100 or percentage < 0:
         print("Please enter a percentage between 0 and 100")
         return
@@ -38,37 +51,39 @@ def main(percentage: float, chart: str = "hot-100", autoplay: bool = True):
 
     try:
         sp = authenticate_spotify()
-    except HTTPError:
+        # return True
+    except HTTPError as e:
+        logging.debug(e)
         print(
             "Please ensure that Spotify is open on your device and you are logged in."
         )
         print("It may help to play a song on Spotify before trying again.")
-        raise HTTPException(status_code=500, detail="Spotify authentication failed")
+        raise HTTPException(
+            status_code=500, detail="Spotify authentication failed"
+        ) from e
 
-    # devices = sp.devices()
-    # device_list = devices['devices']
+    # # devices = sp.devices()
+    # # device_list = devices['devices']
+
+    print("about to call spotify_link")
 
     link, name, uri = spotify_link(sp, song_name, artist_name)
 
     print(f"Here's a link to the song {name} on Spotify")
     print(link)
+    if autoplay:
+        start_playing_on_spotify(sp, uri)
 
-    # Throw print statements into function calls to clean this up
-
-    # Spotify describes the song as belonging to these genres:
-
-    # Genius song description:
-
-    start_playing_on_spotify(sp, uri)
+    # TODO: Throw print statements into function calls to clean this up
+    # TODO: Spotify describes the song as belonging to these genres:
+    # TODO: Genius song description:
 
 
 def authenticate_spotify():
-    # import variables from json file
-    with open("spotify_credentials.json", encoding="utf-8") as f:
-        credentials = json.load(f)
-    spotify_client_id = credentials["client_id"]
-    spotify_client_secret = credentials["client_secret"]
-    spotify_redirect_uri = "http://localhost:8080/"
+    spotify_client_id = CLIENT_ID
+    spotify_client_secret = CLIENT_SECRET
+    # spotify_redirect_uri = "http://localhost:8000"
+    spotify_redirect_uri = "https://trainingsong-1-h1171059.deta.app/"
     scope = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
     # Create a SpotifyOAuth object
@@ -80,8 +95,14 @@ def authenticate_spotify():
     )
 
     # Get the access token
-    token_info = sp_oauth.get_cached_token() or sp_oauth.get_access_token()
-    access_token = token_info["access_token"]
+    # token_info = sp_oauth.get_cached_token() or sp_oauth.get_access_token()
+    print("About to get access token")
+    token_info = sp_oauth.get_access_token(check_cache=False)
+    print("token info", token_info)
+    if token_info:
+        access_token = token_info["access_token"]
+    else:
+        raise HTTPException(status_code=500, detail="Unable to get access token")
 
     # Create a Spotify client with the access token
     sp = spotipy.Spotify(auth=access_token)
@@ -91,7 +112,7 @@ def authenticate_spotify():
 
 def get_number_one_song(
     percentage: float, chart: str = "hot-100"
-) -> Tuple[str, datetime.date]:
+) -> Tuple[Song, datetime.date]:
     target_year = int(percentage)
 
     # Calculate the target date based on the fractional part of the percentage
@@ -110,10 +131,10 @@ def get_number_one_song(
     )
 
     # Fetch the Billboard Hot 100 chart data for the target date
-    chart = billboard.ChartData("hot-100", date=target_date)
+    chart_output = billboard.ChartData(chart, date=target_date)
 
     # Get the Number 1 song on the chart
-    number_one_song = chart[0]
+    number_one_song = chart_output[0]
 
     # TODO: Billboard started in 1958. We need to think of something to do
     # with the years before that
@@ -150,10 +171,60 @@ app = FastAPI()
 
 
 @app.get("/")
-async def root(p: float, chart: str = "hot-100", autoplay: bool = True):
+async def root(
+    p: Union[float, None] = None, chart: str = "hot-100", autoplay: bool = True
+):
+    if p is None:
+        return {"Hello": "World"}
     try:
         main(p, chart, autoplay)
         return {"percentage": p, "chart": chart, "autoplay": autoplay}
-    except Exception:
-        return {"error": "Yo"}
-        # raise HTTPException(status_code=500, detail=e)
+    except Exception as e:
+        return {"error": "Yo", "exception": str(e)}
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    return {"file": "static/favicon.ico"}
+
+
+@app.get("/login")
+def login():
+    sp_oauth = spotipy.SpotifyOAuth(
+        client_id="your_client_id",
+        client_secret="your_client_secret",
+        redirect_uri="your_redirect_uri",
+        scope="required_scopes",
+        cache_path=None,
+    )
+    auth_url = sp_oauth.get_authorize_url()
+    return RedirectResponse(auth_url)
+
+
+@app.get("/callback/{code}")
+def callback(code: str):
+    sp_oauth = spotipy.SpotifyOAuth(
+        client_id="your_client_id",
+        client_secret="your_client_secret",
+        redirect_uri="your_redirect_uri",
+        scope="required_scopes",
+        cache_path=None,
+    )
+    # code = request.args.get("code")
+    token_info = sp_oauth.get_access_token(code)
+
+    if token_info:
+        access_token = token_info["access_token"]
+    else:
+        raise HTTPException(status_code=500, detail="Unable to get access token")
+    # Store the access token somewhere (like a session)
+    # Then, redirect the user wherever you like
+    return RedirectResponse("/some-page-in-your-app")
+
+
+# @app.get("/")
+# async def root():
+#     return {"Hello": "World"}
