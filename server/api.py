@@ -191,7 +191,6 @@ async def root(
         return {"Hello": "World"}
     try:
         main(spotify_client_id, spotify_client_secret, p, chart, autoplay)
-        RedirectResponse(url="/static/index.html")
         return {"percentage": p, "chart": chart, "autoplay": autoplay}
     except Exception as e:
         return {"error": "Yo", "exception": str(e)}
