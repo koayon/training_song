@@ -28,7 +28,13 @@ class Song:
     title: str
 
 
-def main(percentage: float, chart: str = "hot-100", autoplay: bool = True) -> None:
+def main(
+    spotify_client_id,
+    spotify_client_secret,
+    percentage: float,
+    chart: str = "hot-100",
+    autoplay: bool = True,
+) -> None:
     if percentage > 100 or percentage < 0:
         print("Please enter a percentage between 0 and 100")
         return
@@ -49,8 +55,10 @@ def main(percentage: float, chart: str = "hot-100", autoplay: bool = True) -> No
     )
     print(datetime.datetime.now())
 
+    # return percentage, song_name, artist_name, autoplay, target_date
+
     try:
-        sp = authenticate_spotify()
+        sp = authenticate_spotify(spotify_client_id, spotify_client_secret)
         # return True
     except HTTPError as e:
         logging.debug(e)
@@ -79,9 +87,9 @@ def main(percentage: float, chart: str = "hot-100", autoplay: bool = True) -> No
     # TODO: Genius song description:
 
 
-def authenticate_spotify():
-    spotify_client_id = CLIENT_ID
-    spotify_client_secret = CLIENT_SECRET
+def authenticate_spotify(spotify_client_id, spotify_client_secret):
+    # spotify_client_id = CLIENT_ID
+    # spotify_client_secret = CLIENT_SECRET
     # spotify_redirect_uri = "http://localhost:8000"
     spotify_redirect_uri = "https://trainingsong-1-h1171059.deta.app/"
     scope = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
@@ -93,11 +101,13 @@ def authenticate_spotify():
         redirect_uri=spotify_redirect_uri,
         scope=scope,
     )
+    print(spotify_client_id)
 
     # Get the access token
     # token_info = sp_oauth.get_cached_token() or sp_oauth.get_access_token()
     print("About to get access token")
-    token_info = sp_oauth.get_access_token(check_cache=False)
+    token_info = sp_oauth.get_access_token()
+    print("Got access token")
     print("token info", token_info)
     if token_info:
         access_token = token_info["access_token"]
@@ -172,12 +182,16 @@ app = FastAPI()
 
 @app.get("/")
 async def root(
-    p: Union[float, None] = None, chart: str = "hot-100", autoplay: bool = True
+    p: Union[float, None] = None, chart: str = "hot-100", autoplay: bool = False
 ):
+    spotify_client_id = CLIENT_ID
+    spotify_client_secret = CLIENT_SECRET
+
     if p is None:
         return {"Hello": "World"}
     try:
-        main(p, chart, autoplay)
+        main(spotify_client_id, spotify_client_secret, p, chart, autoplay)
+        RedirectResponse(url="/static/index.html")
         return {"percentage": p, "chart": chart, "autoplay": autoplay}
     except Exception as e:
         return {"error": "Yo", "exception": str(e)}
