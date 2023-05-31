@@ -197,46 +197,46 @@ async def root(
         return {"error": "Yo", "exception": str(e)}
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-@app.get("/favicon.ico")
-async def favicon():
-    return {"file": "static/favicon.ico"}
+# @app.get("/favicon.ico")
+# async def favicon():
+#     return {"file": "static/favicon.ico"}
 
 
-@app.get("/login")
-def login():
-    sp_oauth = spotipy.SpotifyOAuth(
-        client_id="your_client_id",
-        client_secret="your_client_secret",
-        redirect_uri="your_redirect_uri",
-        scope="required_scopes",
-        cache_path=None,
-    )
-    auth_url = sp_oauth.get_authorize_url()
-    return RedirectResponse(auth_url)
+# @app.get("/login")
+# def login():
+#     sp_oauth = spotipy.SpotifyOAuth(
+#         client_id="your_client_id",
+#         client_secret="your_client_secret",
+#         redirect_uri="your_redirect_uri",
+#         scope="required_scopes",
+#         cache_path=None,
+#     )
+#     auth_url = sp_oauth.get_authorize_url()
+#     return RedirectResponse(auth_url)
 
 
-@app.get("/callback/{code}")
-def callback(code: str):
-    sp_oauth = spotipy.SpotifyOAuth(
-        client_id="your_client_id",
-        client_secret="your_client_secret",
-        redirect_uri="your_redirect_uri",
-        scope="required_scopes",
-        cache_path=None,
-    )
-    # code = request.args.get("code")
-    token_info = sp_oauth.get_access_token(code)
+# @app.get("/callback/{code}")
+# def callback(code: str):
+#     sp_oauth = spotipy.SpotifyOAuth(
+#         client_id="your_client_id",
+#         client_secret="your_client_secret",
+#         redirect_uri="your_redirect_uri",
+#         scope="required_scopes",
+#         cache_path=None,
+#     )
+#     # code = request.args.get("code")
+#     token_info = sp_oauth.get_access_token(code)
 
-    if token_info:
-        access_token = token_info["access_token"]
-    else:
-        raise HTTPException(status_code=500, detail="Unable to get access token")
-    # Store the access token somewhere (like a session)
-    # Then, redirect the user wherever you like
-    return RedirectResponse("/some-page-in-your-app")
+#     if token_info:
+#         access_token = token_info["access_token"]
+#     else:
+#         raise HTTPException(status_code=500, detail="Unable to get access token")
+#     # Store the access token somewhere (like a session)
+#     # Then, redirect the user wherever you like
+#     return RedirectResponse("/some-page-in-your-app")
 
 
 # @app.get("/")
