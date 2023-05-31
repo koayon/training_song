@@ -4,3 +4,5 @@ spotify_credentials.json
 .space
 .env
 env_vars.py
+__pycache__
+.pyc
