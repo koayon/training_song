@@ -13,7 +13,7 @@ from env_vars import CLIENT_ID, CLIENT_SECRET
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
-PROD = False
+PROD = True
 
 if PROD:
     SPOTIFY_REDIRECT_URI = "https://trainingsong-1-h1171059.deta.app/api_callback"
