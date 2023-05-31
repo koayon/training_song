@@ -1,7 +1,7 @@
 import requests
 import uvicorn
 
-PROD = True
+PROD = False
 # PORT = 8000
 
 uvicorn.run("server.api:app", host="0.0.0.0")
