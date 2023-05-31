@@ -10,7 +10,8 @@ from urllib.error import HTTPError
 import logging
 import os
 from dataclasses import dataclass
-from dotenv import load_dotenv
+
+# from dotenv import load_dotenv
 from urllib.parse import unquote
 
 import billboard
@@ -153,7 +154,7 @@ def start_playing_on_spotify(sp, uri, device_id=None):
 
 app = FastAPI()
 
-load_dotenv()  # take environment variables from .env.
+# load_dotenv()  # take environment variables from .env.
 
 # sp_client_id = os.getenv("CLIENT_ID")
 # sp_client_secret = os.getenv("CLIENT_SECRET")
