@@ -32,11 +32,26 @@ async def root(
     try:
         song_results = get_billboard_data(p, chart)
         if song_results:
-            song_name, artist_name, song_info = song_results
+            (
+                song_name,
+                artist_name,
+                song_info,
+                target_date,
+                percentage,
+                chart,
+            ) = song_results
         else:
             raise HTTPException(status_code=400, detail="No song found")
 
-        response = authenticate_spotify(song_name, artist_name, autoplay, song_info)
+        response = authenticate_spotify(
+            song_name,
+            artist_name,
+            autoplay,
+            song_info,
+            str(target_date),
+            percentage,
+            chart,
+        )
         return response
 
     except Exception as e:
@@ -50,7 +65,15 @@ def callback(request: Request):
     spotify_client_code = request.query_params.get("code")
     state_data = request.query_params.get("state")
     try:
-        song_name, artist_name, autoplay, song_info = parse_state_data(state_data)
+        (
+            song_name,
+            artist_name,
+            autoplay,
+            song_info,
+            target_date,
+            percentage,
+            chart,
+        ) = parse_state_data(state_data)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -73,11 +96,11 @@ def callback(request: Request):
 
     return {
         "spotify_link": link,
-        "song_info": song_info,
         "song_name": song_name,
         "artist_name": artist_name,
-        #  "target_date": target_date
-        #  "percentage": percentage,
-        # "chart": chart
+        "target_date": target_date,
+        "percentage": percentage,
+        "chart": chart,
         "errors": errors,
+        "song_info": song_info,
     }

@@ -18,4 +18,8 @@ def parse_state_data(state):
     artist_name = state_data.get("artist_name")
     autoplay = state_data.get("autoplay")
     song_info = state_data.get("song_info")
-    return song_name, artist_name, autoplay, song_info
+    target_date = state_data.get("target_date")
+    percentage = state_data.get("percentage")
+    chart = state_data.get("chart")
+
+    return song_name, artist_name, autoplay, song_info, target_date, percentage, chart

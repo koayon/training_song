@@ -1,6 +1,8 @@
+"""Spotify API functions"""
+
 from urllib.error import HTTPError
 import json
-from typing import Tuple, Union
+from typing import Tuple
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -10,6 +12,7 @@ from fastapi import HTTPException
 from env_vars import CLIENT_ID, CLIENT_SECRET
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
+
 PROD = False
 
 if PROD:
@@ -18,7 +21,9 @@ else:
     SPOTIFY_REDIRECT_URI = "http://localhost:8000/api_callback"
 
 
-def authenticate_spotify(song_name, artist_name, autoplay, song_info):
+def authenticate_spotify(
+    song_name, artist_name, autoplay, song_info, target_date, percentage, chart
+):
     """Get the Spotify authentication URL"""
 
     # Create a SpotifyOAuth object
@@ -34,6 +39,9 @@ def authenticate_spotify(song_name, artist_name, autoplay, song_info):
         "artist_name": artist_name,
         "autoplay": autoplay,
         "song_info": song_info,
+        "target_date": target_date,
+        "percentage": percentage,
+        "chart": chart,
     }
     auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_data))
     return RedirectResponse(auth_url)

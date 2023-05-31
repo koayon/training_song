@@ -1,3 +1,5 @@
+"""Example of using the API."""
+
 import requests
 import uvicorn
 
