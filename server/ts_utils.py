@@ -1,11 +1,12 @@
 """Utility functions for the API"""
 from urllib.parse import unquote
 import json
+from typing import Tuple
 
 from fastapi import HTTPException
 
 
-def parse_state_data(state):
+def parse_state_data(state: str) -> Tuple[str, str, bool, str, str, float, str]:
     """Parse the state data from the Spotify API callback"""
     if state:
         state = unquote(state)

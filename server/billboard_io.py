@@ -46,11 +46,9 @@ def get_number_one_song(
     # Calculate the target date based on the fractional part of the percentage
     fractional_percentage = percentage % 1
     days_in_year = (
-        365
-        if not (
-            target_year % 4 == 0 and (target_year % 100 != 0 or target_year % 400 == 0)
-        )
-        else 366
+        366
+        if target_year % 4 == 0 and (target_year % 100 != 0 or target_year % 400 == 0)
+        else 365
     )
     target_day = int(days_in_year * fractional_percentage)
 

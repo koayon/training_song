@@ -2,7 +2,7 @@
 
 from urllib.error import HTTPError
 import json
-from typing import Tuple
+from typing import Tuple, Union
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -22,8 +22,14 @@ else:
 
 
 def authenticate_spotify(
-    song_name, artist_name, autoplay, song_info, target_date, percentage, chart
-):
+    song_name: str,
+    artist_name: str,
+    autoplay: bool,
+    song_info: str,
+    target_date: str,
+    percentage: float,
+    chart: str,
+) -> RedirectResponse:
     """Get the Spotify authentication URL"""
 
     # Create a SpotifyOAuth object
@@ -33,6 +39,8 @@ def authenticate_spotify(
         redirect_uri=SPOTIFY_REDIRECT_URI,
         scope=SCOPE,
     )
+
+    # TODO: Move back to server/api.py
 
     state_data = {
         "song_name": song_name,
@@ -47,7 +55,7 @@ def authenticate_spotify(
     return RedirectResponse(auth_url)
 
 
-def create_spotify_client(code):
+def create_spotify_client(code: Union[str, None]) -> spotipy.Spotify:
     """Create a Spotify client using the code from the Spotify API callback"""
 
     sp_oauth = SpotifyOAuth(

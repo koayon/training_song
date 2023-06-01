@@ -4,10 +4,11 @@ the song that was number 1 on the Billboard Hot 100 on that day.
 """
 
 from typing import Union
-from urllib.error import HTTPError
 
 from fastapi import FastAPI, HTTPException, Request
-from local_utils import parse_state_data
+from fastapi.responses import RedirectResponse
+
+from ts_utils import parse_state_data
 from billboard_io import get_billboard_data
 from spotify import (
     create_spotify_client,
@@ -24,7 +25,7 @@ async def root(
     p: Union[float, None] = None,
     chart: str = "hot-100",
     autoplay: bool = False,
-):
+) -> Union[dict, RedirectResponse]:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
 
     if p is None:
@@ -43,46 +44,43 @@ async def root(
         else:
             raise HTTPException(status_code=400, detail="No song found")
 
-        response = authenticate_spotify(
-            song_name,
-            artist_name,
-            autoplay,
-            song_info,
-            str(target_date),
-            percentage,
-            chart,
+        # TODO: do we need to unpack these to pack them back up?
+
+        redirect_with_state = authenticate_spotify(
+            song_name=song_name,
+            artist_name=artist_name,
+            autoplay=autoplay,
+            song_info=song_info,
+            target_date=str(target_date),
+            percentage=percentage,
+            chart=chart,
         )
-        return response
+        return redirect_with_state
 
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
 
 
 @app.get("/api_callback")
-def callback(request: Request):
+def callback(request: Request) -> dict:
     """The callback for the Spotify API once we've authenticated. Gets the song link and plays it if autoplay was selected. Then returns the song info to the endpoint."""
 
     spotify_client_code = request.query_params.get("code")
     state_data = request.query_params.get("state")
-    try:
-        (
-            song_name,
-            artist_name,
-            autoplay,
-            song_info,
-            target_date,
-            percentage,
-            chart,
-        ) = parse_state_data(state_data)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    if not spotify_client_code or not state_data:
+        raise HTTPException(status_code=400, detail="Missing Spotify code or state")
 
-    try:
-        sp = create_spotify_client(spotify_client_code)
-    except HTTPError as e:
-        raise HTTPException(
-            status_code=400, detail="Spotify client authentication failed"
-        ) from e
+    (
+        song_name,
+        artist_name,
+        autoplay,
+        song_info,
+        target_date,
+        percentage,
+        chart,
+    ) = parse_state_data(state_data)
+
+    sp = create_spotify_client(spotify_client_code)
 
     link, _name, uri = spotify_link(sp, song_name, artist_name)
     errors = None

@@ -1,4 +1,4 @@
-"""Example of using the API."""
+"""Example of using the API locally."""
 
 import requests
 import uvicorn
