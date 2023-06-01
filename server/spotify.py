@@ -2,7 +2,8 @@
 
 from urllib.error import HTTPError
 import json
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
+from dataclasses import dataclass, asdict
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -13,22 +14,30 @@ from env_vars import CLIENT_ID, CLIENT_SECRET
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
-PROD = True
+PROD = False
 
 if PROD:
-    SPOTIFY_REDIRECT_URI = "https://trainingsong-1-h1171059.deta.app/api_callback"
+    URL = "https://trainingsong-1-h1171059.deta.app"
 else:
-    SPOTIFY_REDIRECT_URI = "http://localhost:8000/api_callback"
+    URL = "http://localhost:8000"
+SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
+
+
+@dataclass
+class StateData:
+    """Dataclass for authenticate_spotify function"""
+
+    song_name: str
+    artist_name: str
+    autoplay: Optional[bool]
+    song_info: str
+    target_date: str
+    percentage: float
+    chart: str
 
 
 def authenticate_spotify(
-    song_name: str,
-    artist_name: str,
-    autoplay: bool,
-    song_info: str,
-    target_date: str,
-    percentage: float,
-    chart: str,
+    state_data: StateData,
 ) -> RedirectResponse:
     """Get the Spotify authentication URL"""
 
@@ -40,18 +49,8 @@ def authenticate_spotify(
         scope=SCOPE,
     )
 
-    # TODO: Move back to server/api.py
-
-    state_data = {
-        "song_name": song_name,
-        "artist_name": artist_name,
-        "autoplay": autoplay,
-        "song_info": song_info,
-        "target_date": target_date,
-        "percentage": percentage,
-        "chart": chart,
-    }
-    auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_data))
+    state_dict = asdict(state_data)
+    auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_dict))
     return RedirectResponse(auth_url)
 
 

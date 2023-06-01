@@ -3,7 +3,7 @@ The get_billboard_data API. It takes in a percentage and returns
 the song that was number 1 on the Billboard Hot 100 on that day.
 """
 
-from typing import Union
+from typing import Union, Dict
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
@@ -15,6 +15,7 @@ from spotify import (
     authenticate_spotify,
     spotify_link,
     start_playback,
+    URL,
 )
 
 app = FastAPI()
@@ -25,36 +26,16 @@ async def root(
     p: Union[float, None] = None,
     chart: str = "hot-100",
     autoplay: bool = False,
-) -> Union[dict, RedirectResponse]:
+) -> RedirectResponse:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
 
     if p is None:
-        return {"Hello": "World"}
+        return RedirectResponse(f"{URL}/hello")
     try:
         song_results = get_billboard_data(p, chart)
-        if song_results:
-            (
-                song_name,
-                artist_name,
-                song_info,
-                target_date,
-                percentage,
-                chart,
-            ) = song_results
-        else:
-            raise HTTPException(status_code=400, detail="No song found")
+        song_results.autoplay = autoplay
 
-        # TODO: do we need to unpack these to pack them back up?
-
-        redirect_with_state = authenticate_spotify(
-            song_name=song_name,
-            artist_name=artist_name,
-            autoplay=autoplay,
-            song_info=song_info,
-            target_date=str(target_date),
-            percentage=percentage,
-            chart=chart,
-        )
+        redirect_with_state = authenticate_spotify(state_data=song_results)
         return redirect_with_state
 
     except Exception as e:
@@ -62,7 +43,7 @@ async def root(
 
 
 @app.get("/api_callback")
-def callback(request: Request) -> dict:
+def callback(request: Request) -> Dict[str, Union[str, bool, float, None]]:
     """The callback for the Spotify API once we've authenticated. Gets the song link and plays it if autoplay was selected. Then returns the song info to the endpoint."""
 
     spotify_client_code = request.query_params.get("code")
@@ -102,3 +83,10 @@ def callback(request: Request) -> dict:
         "errors": errors,
         "song_info": song_info,
     }
+
+
+@app.get("/hello")
+async def hello() -> Dict[str, str]:
+    """Hello world"""
+
+    return {"Hello": "World"}

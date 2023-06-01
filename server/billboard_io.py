@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import billboard
 from fastapi import HTTPException
 
+from spotify import StateData
+
 
 @dataclass
 class Song:
@@ -18,12 +20,10 @@ class Song:
 def get_billboard_data(
     percentage: float,
     chart: str = "hot-100",
-) -> Tuple[str, str, str, datetime.date, float, str]:
+) -> StateData:
     """Call Billboard API and get the song name, artist name and song info"""
     if percentage > 100 or percentage < 0:
-        raise HTTPException(
-            status_code=400, detail="Please enter a percentage between 0 and 100"
-        )
+        raise ValueError("Please enter a percentage between 0 and 100")
     if percentage < 1:
         # Turn a decimal into a percentage
         percentage *= 100
@@ -34,7 +34,16 @@ def get_billboard_data(
     artist_name = number_one_song.artist
 
     song_info = f"""The Number 1 song {percentage}% through the 1900s on the {chart} chart was {song_name} by {artist_name}. \n The date was {target_date} and the song was on the chart for {number_one_song.weeks} weeks."""
-    return song_name, artist_name, song_info, target_date, percentage, chart
+    result = StateData(
+        song_name=song_name,
+        artist_name=artist_name,
+        autoplay=None,
+        song_info=song_info,
+        target_date=str(target_date),
+        percentage=percentage,
+        chart=chart,
+    )
+    return result
 
 
 def get_number_one_song(
