@@ -11,7 +11,6 @@ from ts_utils import parse_state_data
 from billboard_io import get_billboard_data
 from spotify import (
     create_spotify_client,
-    authenticate_spotify,
     spotify_link,
     start_playback,
     URL,
@@ -37,30 +36,15 @@ async def root(
     except HTTPException as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
 
-    #         redirect_with_state = authenticate_spotify(state_data=song_results, code=code)
-    #         return redirect_with_state
+    if code:
+        spotify_client_code = code
+    else:
+        spotify_client_code = None
+        # Really we want to request a code if we're actually calling this locally???
 
-    #     except Exception as e:
-    #         raise HTTPException(status_code=404, detail=str(e)) from e
-
-    # @app.get("/api_callback")
-    # def callback(request: Request) -> Dict[str, Union[str, bool, float, None]]:
-    #     """The callback for the Spotify API once we've authenticated. Gets the song link and plays it if autoplay was selected. Then returns the song info to the endpoint."""
-
-    spotify_client_code = code
     state_data = song_results
     if not spotify_client_code or not state_data:
         raise HTTPException(status_code=400, detail="Missing Spotify code or state")
-
-    # (
-    #     song_name,
-    #     artist_name,
-    #     autoplay,
-    #     song_info,
-    #     target_date,
-    #     percentage,
-    #     chart,
-    # ) = parse_state_data(state_data)
 
     song_name = state_data.song_name
     artist_name = state_data.artist_name

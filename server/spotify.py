@@ -22,7 +22,8 @@ if PROD:
 else:
     URL = "http://localhost:8000"
     from env_vars import CLIENT_ID, CLIENT_SECRET
-SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
+# SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
+SPOTIFY_REDIRECT_URI = URL
 
 
 @dataclass
@@ -36,24 +37,6 @@ class StateData:
     target_date: str
     percentage: float
     chart: str
-
-
-def authenticate_spotify(
-    state_data: StateData,
-) -> RedirectResponse:
-    """Get the Spotify authentication URL"""
-
-    # Create a SpotifyOAuth object
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=SPOTIFY_REDIRECT_URI,
-        scope=SCOPE,
-    )
-
-    state_dict = asdict(state_data)
-    auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_dict))
-    return RedirectResponse(auth_url)
 
 
 def create_spotify_client(code: Union[str, None]) -> spotipy.Spotify:

@@ -15,6 +15,8 @@ from server.spotify import CLIENT_ID, CLIENT_SECRET, SCOPE
 
 local_app = FastAPI()
 OAUTH_CODE = None
+# TODO: Search cache for code and use that if it exists?
+AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813dbf19d8b20608&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Flocal_callback&scope=user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"
 LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
 
 
@@ -22,7 +24,6 @@ def training_song(
     acc: Union[float, List[float], None],
     chart: Optional[str] = "hot-100",
     autoplay: Optional[bool] = False,
-    # ) -> Tuple[Union[float, List[float], None], dict]:
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Return the training song for a given percentage"""
 
@@ -30,6 +31,8 @@ def training_song(
         p = acc if isinstance(acc, float) else acc[-1]
     else:
         p = None
+
+    print()
 
     params = {
         "p": p,
@@ -44,7 +47,8 @@ def training_song(
         timeout=15,
         allow_redirects=True,
     )
-
+    print(raw_response.status_code)
+    print(raw_response.url)
     print(raw_response.content)
     response = raw_response.json()
 
@@ -70,19 +74,6 @@ def start_local_server():
     uvicorn.run(local_app, host="0.0.0.0", port=8000)
 
 
-def authorize():
-    """Get the Spotify authentication URL and open it in a browser"""
-    # Create a SpotifyOAuth object
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=LOCAL_REDIRECT_URI,
-        scope=SCOPE,
-    )
-    auth_url = sp_oauth.get_authorize_url()
-    webbrowser.open(auth_url)
-
-
 if __name__ == "__main__":
     raw_input = input("How well did your model do? (Enter a percentage): ")
     input_percentage = float(raw_input) if raw_input else None
@@ -92,15 +83,13 @@ if __name__ == "__main__":
     server_thread.start()
 
     # open the authorization URL in a browser
-    authorize()
+    webbrowser.open(AUTH_URL)
 
     # wait for the user to authorize and for the server to capture the OAuth code
     while not OAUTH_CODE:
         time.sleep(1)
 
     # now we can call the training_song function with the captured OAuth code
-    training_song(input_percentage)
-
     print()
     training_song(input_percentage)
 
