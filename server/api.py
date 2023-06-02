@@ -27,13 +27,16 @@ async def root(
 ) -> Dict[str, Union[str, bool, float, None]]:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
 
+    print("Started!")
+
     if p is None:
         return {"hello": "world"}
     try:
         song_results = get_billboard_data(p, chart)
         song_results.autoplay = autoplay
 
-        sp = authenticate_spotify(song_results)
+        print("Got song results! About to authenticate Spotify...")
+        sp = authenticate_spotify()
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
 
@@ -43,8 +46,12 @@ async def root(
     percentage = song_results.percentage
     song_info = song_results.song_info
 
+    print("About to get Spotify link...")
+
     link, _name, uri = spotify_link(sp, song_name, artist_name)
     errors = ""
+
+    print("Got Spotify link, about to start playback")
 
     devices = sp.devices()
     active_devices = devices["devices"] if devices else None

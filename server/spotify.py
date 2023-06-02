@@ -39,9 +39,7 @@ class StateData:
     chart: str
 
 
-def authenticate_spotify(
-    state_data: StateData,
-) -> spotipy.Spotify:
+def authenticate_spotify() -> spotipy.Spotify:
     """Get the Spotify authentication URL"""
 
     # state_dict = asdict(state_data)
