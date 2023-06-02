@@ -1,6 +1,5 @@
 """
-The get_billboard_data API. It takes in a percentage and returns
-the song that was number 1 on the Billboard Hot 100 on that day.
+Main API file.
 """
 
 from typing import Union, Dict
@@ -26,40 +25,50 @@ async def root(
     p: Union[float, None] = None,
     chart: str = "hot-100",
     autoplay: bool = False,
-) -> RedirectResponse:
+    code: str = "",
+) -> Dict[str, Union[str, bool, float, None]]:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
 
     if p is None:
-        return RedirectResponse(f"{URL}/hello")
+        return {"hello": "world"}
     try:
         song_results = get_billboard_data(p, chart)
         song_results.autoplay = autoplay
-
-        redirect_with_state = authenticate_spotify(state_data=song_results)
-        return redirect_with_state
-
-    except Exception as e:
+    except HTTPException as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
 
+    #         redirect_with_state = authenticate_spotify(state_data=song_results, code=code)
+    #         return redirect_with_state
 
-@app.get("/api_callback")
-def callback(request: Request) -> Dict[str, Union[str, bool, float, None]]:
-    """The callback for the Spotify API once we've authenticated. Gets the song link and plays it if autoplay was selected. Then returns the song info to the endpoint."""
+    #     except Exception as e:
+    #         raise HTTPException(status_code=404, detail=str(e)) from e
 
-    spotify_client_code = request.query_params.get("code")
-    state_data = request.query_params.get("state")
+    # @app.get("/api_callback")
+    # def callback(request: Request) -> Dict[str, Union[str, bool, float, None]]:
+    #     """The callback for the Spotify API once we've authenticated. Gets the song link and plays it if autoplay was selected. Then returns the song info to the endpoint."""
+
+    spotify_client_code = code
+    state_data = song_results
     if not spotify_client_code or not state_data:
         raise HTTPException(status_code=400, detail="Missing Spotify code or state")
 
-    (
-        song_name,
-        artist_name,
-        autoplay,
-        song_info,
-        target_date,
-        percentage,
-        chart,
-    ) = parse_state_data(state_data)
+    # (
+    #     song_name,
+    #     artist_name,
+    #     autoplay,
+    #     song_info,
+    #     target_date,
+    #     percentage,
+    #     chart,
+    # ) = parse_state_data(state_data)
+
+    song_name = state_data.song_name
+    artist_name = state_data.artist_name
+    autoplay = state_data.autoplay is True
+    song_info = state_data.song_info
+    target_date = state_data.target_date
+    percentage = state_data.percentage
+    chart = state_data.chart
 
     sp = create_spotify_client(spotify_client_code)
 
@@ -70,7 +79,7 @@ def callback(request: Request) -> Dict[str, Union[str, bool, float, None]]:
         try:
             start_playback(sp, uri)
 
-        except Exception:
+        except HTTPException:
             errors = "Unable to start playback. Please ensure that Spotify is active on one of your devices and try again."
 
     return {

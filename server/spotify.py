@@ -4,22 +4,24 @@ from urllib.error import HTTPError
 import json
 from typing import Tuple, Union, Optional
 from dataclasses import dataclass, asdict
+import os
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi.responses import RedirectResponse
 from fastapi import HTTPException
 
-from env_vars import CLIENT_ID, CLIENT_SECRET
-
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
-PROD = False
+PROD = True
 
 if PROD:
-    URL = "https://trainingsong-1-h1171059.deta.app"
+    URL = "https://training-song-api-koayon.vercel.app"
+    CLIENT_ID = os.environ.get("CLIENT_ID")
+    CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 else:
     URL = "http://localhost:8000"
+    from env_vars import CLIENT_ID, CLIENT_SECRET
 SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
 
 
