@@ -2,8 +2,9 @@
 
 from typing import Union, List, Optional, Tuple, Dict, Any
 import requests
+from server.spotify import SPOTIFY_REDIRECT_URI
 
-BASE_URL = "https://trainingsong-1-h1171059.deta.app/"
+# BASE_URL = "https://trainingsong-1-h1171059.deta.app/"
 # BASE_URL = "http://localhost:8000/"
 
 
@@ -20,7 +21,7 @@ def training_song(
         p = None
 
     raw_response = requests.get(
-        BASE_URL,
+        SPOTIFY_REDIRECT_URI,
         params={
             "p": p,
             "autoplay": autoplay,

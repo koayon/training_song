@@ -1,29 +1,28 @@
 """Spotify API functions"""
 
 from urllib.error import HTTPError
-import json
-from typing import Tuple, Union, Optional
-from dataclasses import dataclass, asdict
+from typing import Tuple, Optional
+from dataclasses import dataclass
+import os
 
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-from fastapi.responses import RedirectResponse
 from fastapi import HTTPException
 
-from env_vars import CLIENT_ID, CLIENT_SECRET
-
-print(CLIENT_ID)
 
 AUTH_SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
 PROD = True
 
 if PROD:
-    URL = "https://trainingsong-1-h1171059.deta.app"
+    URL = "https://training-song-api-koayon.vercel.app"
+    CLIENT_ID = os.environ.get("CLIENT_ID")
+    CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 else:
     URL = "http://localhost:8000"
+    from env_vars import CLIENT_ID, CLIENT_SECRET
 # SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
 SPOTIFY_REDIRECT_URI = URL
+print("CLIENT_ID", CLIENT_ID)
 
 
 @dataclass
@@ -42,9 +41,8 @@ class StateData:
 def authenticate_spotify() -> spotipy.Spotify:
     """Get the Spotify authentication URL"""
 
-    # state_dict = asdict(state_data)
-    # auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_dict))
-    # return RedirectResponse(auth_url)
+    print("In authenticate_spotify")
+    print("CLIENT_ID", CLIENT_ID)
 
     token = spotipy.util.prompt_for_user_token(
         client_id=CLIENT_ID,
@@ -52,7 +50,9 @@ def authenticate_spotify() -> spotipy.Spotify:
         redirect_uri=SPOTIFY_REDIRECT_URI,
         scope=AUTH_SCOPE,
     )
+    print("Got token")
     sp = spotipy.Spotify(auth=token)
+    print("Got sp object")
     return sp
 
 
