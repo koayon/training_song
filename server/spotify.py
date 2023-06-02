@@ -12,15 +12,18 @@ from fastapi import HTTPException
 
 from env_vars import CLIENT_ID, CLIENT_SECRET
 
-SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
+print(CLIENT_ID)
 
-PROD = False
+AUTH_SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
+
+PROD = True
 
 if PROD:
     URL = "https://trainingsong-1-h1171059.deta.app"
 else:
     URL = "http://localhost:8000"
-SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
+# SPOTIFY_REDIRECT_URI = f"{URL}/api_callback"
+SPOTIFY_REDIRECT_URI = URL
 
 
 @dataclass
@@ -38,38 +41,20 @@ class StateData:
 
 def authenticate_spotify(
     state_data: StateData,
-) -> RedirectResponse:
+) -> spotipy.Spotify:
     """Get the Spotify authentication URL"""
 
-    # Create a SpotifyOAuth object
-    sp_oauth = SpotifyOAuth(
+    # state_dict = asdict(state_data)
+    # auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_dict))
+    # return RedirectResponse(auth_url)
+
+    token = spotipy.util.prompt_for_user_token(
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         redirect_uri=SPOTIFY_REDIRECT_URI,
-        scope=SCOPE,
+        scope=AUTH_SCOPE,
     )
-
-    state_dict = asdict(state_data)
-    auth_url = sp_oauth.get_authorize_url(state=json.dumps(state_dict))
-    return RedirectResponse(auth_url)
-
-
-def create_spotify_client(code: Union[str, None]) -> spotipy.Spotify:
-    """Create a Spotify client using the code from the Spotify API callback"""
-
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=SPOTIFY_REDIRECT_URI,
-        scope=SCOPE,
-    )
-
-    # Get the access token
-    token_info = sp_oauth.get_access_token(code)
-    access_token = token_info["access_token"] if token_info else None
-
-    # Create a Spotify client with the access token
-    sp = spotipy.Spotify(auth=access_token)
+    sp = spotipy.Spotify(auth=token)
     return sp
 
 
