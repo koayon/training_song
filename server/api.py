@@ -4,16 +4,13 @@ Main API file.
 
 from typing import Union, Dict
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, HTTPException
 
-from ts_utils import parse_state_data
 from billboard_io import get_billboard_data
 from spotify import (
     create_spotify_client,
     spotify_link,
     start_playback,
-    URL,
 )
 
 app = FastAPI()
