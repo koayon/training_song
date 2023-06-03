@@ -1,17 +1,15 @@
 """Entry point"""
 
-from typing import Union, List, Optional, Tuple, Dict, Any
-import requests
-import time
+from typing import Union, List, Optional, Tuple, Dict, Any, NamedTuple
 import webbrowser
 from threading import Thread
+import time
 
+import requests
 import uvicorn
 from fastapi import FastAPI, Request
-from spotipy.oauth2 import SpotifyOAuth
 
-from server.spotify import URL
-from server.spotify import CLIENT_ID, CLIENT_SECRET, SCOPE
+URL = "https://training-song-api.vercel.app"
 
 local_app = FastAPI()
 OAUTH_CODE = None
@@ -24,11 +22,13 @@ def training_song(
     acc: Union[float, List[float], None],
     chart: Optional[str] = "hot-100",
     autoplay: Optional[bool] = False,
+    verbose: Optional[bool] = False,
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
-    """Return the training song for a given percentage"""
+    """Return the training song for a given percentage
+    Outputs: (acc, response)"""
 
     if acc:
-        p = acc if isinstance(acc, float) else acc[-1]
+        p = acc if isinstance(acc, (float, int)) else acc[-1]
     else:
         p = None
 
@@ -47,16 +47,14 @@ def training_song(
         timeout=15,
         allow_redirects=True,
     )
-    print(raw_response.status_code)
-    print(raw_response.url)
-    print(raw_response.content)
     response = raw_response.json()
 
-    print("Congrats your model got an accuracy of", p, "percent!")
-    try:
-        print(response["song_info"])
-    except AttributeError:
-        print("No song info found")
+    if verbose:
+        print("Congrats your model got an accuracy of", p, "percent!")
+        try:
+            print(response["song_info"])
+        except AttributeError:
+            print("No song info found")
 
     return acc, response
 
@@ -66,17 +64,29 @@ async def spotify_callback(request: Request):
     "Callback for the local server to capture the OAuth code"
     global OAUTH_CODE
     OAUTH_CODE = request.query_params.get("code")
-    print(f"Captured OAuth code: {OAUTH_CODE}")
     return "Success! You can close this window."
 
 
 def start_local_server():
+    "Start the local server"
     uvicorn.run(local_app, host="0.0.0.0", port=8000)
 
 
-if __name__ == "__main__":
-    raw_input = input("How well did your model do? (Enter a percentage): ")
-    input_percentage = float(raw_input) if raw_input else None
+def ts(
+    input_percentage: float, chart="hot-100", autoplay=False, verbose=False
+) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
+    """Training song function.
+    Starts a local server to capture the auth code from spotify and returns the song for your training accuracy.
+    Args:
+    input_percentage (float): The accuracy of your model.
+    chart (str): The chart to use. Defaults to "hot-100".
+    autoplay (bool): Whether to autoplay the song. Defaults to False.
+    verbose (bool): Whether to print the song info. Defaults to False.
+
+    Outputs:
+    acc: The accuracy of your model. In the same form as you put it in.
+    response: The response from the server as a dictionary.
+    """
 
     # start the local server in a new thread
     server_thread = Thread(target=start_local_server)
@@ -90,9 +100,17 @@ if __name__ == "__main__":
         time.sleep(1)
 
     # now we can call the training_song function with the captured OAuth code
-    print()
-    training_song(input_percentage)
+    acc, response = training_song(
+        input_percentage, chart=chart, autoplay=autoplay, verbose=verbose
+    )
+    return acc, response
 
-    # When you're done, you can stop the local server
-    # Note: Uvicorn doesn't officially support programmatically stopping the server yet,
-    # you may have to manually stop the server by interrupting the process (Ctrl+C)
+
+if __name__ == "__main__":
+    INPUT_PERCENTAGE = None
+    RAW_INPUT = ""
+    while not INPUT_PERCENTAGE:
+        RAW_INPUT = input("How well did your model do? (Enter a percentage): ")
+    INPUT_PERCENTAGE = float(RAW_INPUT)
+
+    ts(INPUT_PERCENTAGE)
