@@ -3,7 +3,6 @@ from typing import Tuple
 from dataclasses import dataclass
 
 import billboard
-from fastapi import HTTPException
 
 from spotify import StateData
 
@@ -15,6 +14,9 @@ class Song:
     artist: str
     weeks: int
     title: str
+
+
+# TODO: Put in some error handling
 
 
 def get_billboard_data(

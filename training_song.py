@@ -33,13 +33,11 @@ def training_song(
     else:
         p = None
 
-    print()
-
     params = {
         "p": p,
         "autoplay": autoplay,
         "chart": chart,
-        "code": OAUTH_CODE,
+        "spotify_client_code": OAUTH_CODE,
     }
 
     raw_response = requests.get(
