@@ -76,6 +76,7 @@ def ts(
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Training song function.
     Starts a local server to capture the auth code from spotify and returns the song for your training accuracy.
+
     Args:
     input_percentage (float): The accuracy of your model.
     chart (str): The chart to use. Defaults to "hot-100".

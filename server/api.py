@@ -3,8 +3,9 @@ Main API file.
 """
 
 from typing import Union, Dict
+import webbrowser
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Path
 
 from billboard_io import get_billboard_data
 from spotify import (
@@ -18,16 +19,12 @@ app = FastAPI()
 
 @app.get("/")
 async def root(
-    p: Union[float, None] = None,
+    spotify_client_code: str,
+    p: float = Path(..., ge=0, le=100),
     chart: str = "hot-100",
     autoplay: bool = False,
-    spotify_client_code: str = "",
-    # TODO: Make this non-optional
 ) -> Dict[str, Union[str, bool, float, None]]:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
-
-    if p is None:
-        return {"hello": "world"}
 
     try:
         song_results = get_billboard_data(p, chart)
@@ -51,6 +48,7 @@ async def root(
         errors = attempt_play(sp, uri)
     else:
         errors = ""
+        webbrowser.open(link)
 
     output = {
         "spotify_link": link,
@@ -64,6 +62,11 @@ async def root(
     }
 
     return output
+
+
+@app.get("/hello")
+async def hello():
+    return {"hello": "world"}
 
 
 def attempt_play(sp, uri):
