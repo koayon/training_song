@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import billboard
 
 from spotify import StateData
+from fastapi import HTTPException
 
 
 @dataclass
@@ -16,9 +17,6 @@ class Song:
     artist: str
     weeks: int
     title: str
-
-
-# TODO: Put in some error handling
 
 
 def get_billboard_data(
@@ -32,7 +30,10 @@ def get_billboard_data(
         # Turn a decimal into a percentage
         percentage *= 100
 
-    number_one_song, target_date = get_number_one_song(percentage, chart)
+    try:
+        number_one_song, target_date = get_number_one_song(percentage, chart)
+    except HTTPException:
+        raise HTTPException(status_code=404, detail="No chart data found")
 
     song_name = number_one_song.title
     artist_name = number_one_song.artist
@@ -73,7 +74,10 @@ def get_number_one_song(
     chart_output = billboard.ChartData(chart, date=target_date)
 
     # Get the Number 1 song on the chart
-    number_one_song = chart_output[0]
+    if chart_output:
+        number_one_song = chart_output[0]
+    else:
+        raise HTTPException(status_code=404, detail="No chart data found")
 
     # TODO: Billboard started in 1958. We need to think of something to do
     # with the years before that
