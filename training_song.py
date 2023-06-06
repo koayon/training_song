@@ -19,19 +19,14 @@ AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813
 LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
 
 
-def training_song(
-    acc: Union[float, List[float], None],
+def _training_song(
+    p: float,
     chart: Optional[str] = "hot-100",
-    autoplay: Optional[bool] = False,
-    verbose: Optional[bool] = False,
+    autoplay: Optional[bool] = True,
+    verbose: Optional[bool] = True,
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Return the training song for a given percentage
     Outputs: (acc, response)"""
-
-    if acc:
-        p = acc if isinstance(acc, (float, int)) else acc[-1]
-    else:
-        p = None
 
     params = {
         "p": p,
@@ -55,7 +50,7 @@ def training_song(
         except AttributeError:
             print("No song info found")
 
-    return acc, response
+    return p, response
 
 
 @local_app.get("/local_callback")
@@ -66,13 +61,16 @@ async def spotify_callback(request: Request):
     return "Success! You can close this window."
 
 
-def start_local_server():
+def _start_local_server():
     "Start the local server"
     uvicorn.run(local_app, host="0.0.0.0", port=8000)
 
 
 def ts(
-    input_percentage: float, chart="hot-100", autoplay=False, verbose=False
+    input_percentage: Union[float, list[float]],
+    chart="hot-100",
+    autoplay=False,
+    verbose=False,
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Training song function.
     Starts a local server to capture the auth code from spotify and returns the song for your training accuracy.
@@ -89,7 +87,7 @@ def ts(
     """
 
     # start the local server in a new thread
-    server_thread = Thread(target=start_local_server)
+    server_thread = Thread(target=_start_local_server)
     server_thread.start()
 
     # open the authorization URL in a browser
@@ -99,9 +97,15 @@ def ts(
     while not OAUTH_CODE:
         time.sleep(1)
 
+    accuracy = (
+        input_percentage
+        if isinstance(input_percentage, (float, int))
+        else input_percentage[-1]
+    )
+
     # now we can call the training_song function with the captured OAuth code
-    acc, response = training_song(
-        input_percentage, chart=chart, autoplay=autoplay, verbose=verbose
+    acc, response = _training_song(
+        accuracy, chart=chart, autoplay=autoplay, verbose=verbose
     )
     return acc, response
 

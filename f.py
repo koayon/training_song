@@ -1,7 +1,7 @@
 "Example of how to use the training_song module."
 
 # TODO: Train simple classifier as a more credible example as well.
-# TODO: Should this be a notebook instead or in the README?
+# TODO: Should this be a notebook instead (Titanic?) or in the README?
 
 from training_song import ts
 
