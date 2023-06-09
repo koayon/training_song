@@ -1,10 +1,9 @@
 [tool.poetry]
 name = "training-song"
 version = "0.1.0"
-description = "Plays a Billboard Number 1 song corresponding to how accurate your ML model is"
+description = "API for training song"
 authors = ["koayon <koayon@gmail.com>"]
 license = "MIT"
-readme = "README.md"
 packages = [{include = "training_song"}]
 
 [tool.poetry.dependencies]
@@ -14,6 +13,12 @@ lyricsgenius = "^3.0.1"
 spotipy = "^2.23.0"
 billboard-py = "^7.0.0"
 uvicorn = "^0.22.0"
+databases = "^0.5.2"
+sqlalchemy ="^1.4.26"
+python-dotenv ="^1.0.0"
+asyncpg ="^0.27.0"
+psycopg2-binary ="^2.9.6"
+
 
 [tool.poetry.license]
 file = "LICENSE"
