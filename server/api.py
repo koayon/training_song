@@ -5,7 +5,7 @@ Main API file.
 from typing import Union, Dict
 import webbrowser
 
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Query
 
 from billboard_io import get_billboard_data
 from spotify import (
@@ -20,11 +20,14 @@ app = FastAPI()
 @app.get("/")
 async def root(
     spotify_client_code: str,
-    p: float = Path(..., ge=0, le=100),
+    p: float = Query(..., ge=0, le=100),
     chart: str = "hot-100",
     autoplay: bool = False,
+    email: str = None,
 ) -> Dict[str, Union[str, bool, float, None]]:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
+
+    print("Hit root endpoint")
 
     try:
         song_results = get_billboard_data(p, chart)
@@ -32,20 +35,39 @@ async def root(
     except HTTPException as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
 
-    if not spotify_client_code:
-        raise HTTPException(status_code=400, detail="Missing Spotify code")
+    if not spotify_client_code and not email:
+        raise HTTPException(status_code=400, detail="Missing Spotify code and email")
+
+    print("Got spotify code")
 
     song_info = song_results.song_info
     target_date = song_results.target_date
 
-    sp = create_spotify_client(spotify_client_code)
+    try:
+        if spotify_client_code is None and email is None:
+            raise HTTPException(status_code=400, detail="Missing Spotify code and email")
+        sp = create_spotify_client(spotify_client_code, email)
+    except HTTPException as e:
+        # raise HTTPException(
+        #     status_code=404, detail=f"str(e). Failed to created Spotify client"
+        # ) from e
+        return {"errors": f"str(e). Failed to created Spotify client"}
+
+    print(sp)
 
     link, _name, uri = spotify_link(
         sp, song_results.song_name, song_results.artist_name
     )
 
+    print(link)
+
+    print(uri)
+
     if autoplay:
         errors = attempt_play(sp, uri)
+        if errors:
+            errors += "Failed to start playback"
+            webbrowser.open(link)
     else:
         errors = ""
         webbrowser.open(link)
