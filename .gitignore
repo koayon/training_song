@@ -7,3 +7,5 @@ env_vars.py
 __pycache__
 .pyc
 server/__pycache__/api.cpython-310.pyc
+.email
+.oauth
