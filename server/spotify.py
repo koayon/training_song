@@ -4,10 +4,20 @@ from urllib.error import HTTPError
 from typing import Tuple, Union, Optional
 from dataclasses import dataclass
 import os
+import json
+import time
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
+from db.db import store_tokens, get_tokens
+
+with open(".cache", "r") as f:
+    cache_data = json.load(f)
+
+REFRESH_TOKEN = cache_data["refresh_token"]
+# TODO: Store refresh token locally on the client side to use later and then pass it through to here.
+
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
@@ -34,7 +44,7 @@ class StateData:
     chart: str
 
 
-def create_spotify_client(code: Union[str, None]) -> spotipy.Spotify:
+def create_spotify_client(code: Union[str, None], email: Union[str, None]) -> spotipy.Spotify:
     """Create a Spotify client using the code from the Spotify API callback"""
 
     sp_oauth = SpotifyOAuth(
@@ -44,14 +54,32 @@ def create_spotify_client(code: Union[str, None]) -> spotipy.Spotify:
         scope=SCOPE,
     )
 
-    # Get the access token
-    token_info = sp_oauth.get_access_token(code)
+    token_info = get_tokens(email)
+
+    if not token_info:
+        print("Getting access token...")
+        # Get the access token
+        token_info = sp_oauth.get_access_token(code)
+
+    # If the access token is expired, refresh it
+    if token_info["expires_at"] < time.time():
+        print("Refreshing access token...")
+        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+
+    # Put token info into sqlalchemy database
+    store_tokens(email, token_info["access_token"], token_info["refresh_token"],
+                 token_info["expires_at"]
+                )
+
     access_token = token_info["access_token"] if token_info else None
+
+    print("Got access token!")
 
     # Create a Spotify client with the access token
     sp = spotipy.Spotify(auth=access_token)
-    return sp
+    print("Created Spotify client")
 
+    return sp
 
 def spotify_link(sp, song_name: str, artist_name: str) -> Tuple[str, str, str]:
     """Get the Spotify link for the song using the Spotify API"""
