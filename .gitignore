@@ -9,3 +9,6 @@ __pycache__
 server/__pycache__/api.cpython-310.pyc
 .email
 .oauth
+.pytest_cache
+__pycache__/env_vars.cpython-310.pyc
+.vscode
