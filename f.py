@@ -4,8 +4,9 @@
 # TODO: Should this be a notebook instead (Titanic?) or in the README?
 
 from training_song import ts
+import asyncio
 
 if __name__ == "__main__":
-    acc, response = ts(92, autoplay=True, verbose=True, chart="hot-100")
+    acc, response = asyncio.run(ts(92, autoplay=True, verbose=True, chart="hot-100"))
 
     print(acc)

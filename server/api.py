@@ -19,7 +19,7 @@ app = FastAPI()
 
 @app.get("/")
 async def root(
-    spotify_client_code: str,
+    spotify_client_code: str = None,
     p: float = Query(..., ge=0, le=100),
     chart: str = "hot-100",
     autoplay: bool = False,
