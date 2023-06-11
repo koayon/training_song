@@ -12,8 +12,13 @@ from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
 from db.db import store_tokens, get_tokens
 
-with open(".cache", "r") as f:
-    cache_data = json.load(f)
+try:
+    with open("server/.cache", "r") as f:
+        cache_data = json.load(f)
+except FileNotFoundError:
+    print("Cache file not found")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
 
 REFRESH_TOKEN = cache_data["refresh_token"]
 # TODO: Store refresh token locally on the client side to use later and then pass it through to here.

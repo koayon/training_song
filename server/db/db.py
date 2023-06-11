@@ -7,6 +7,7 @@ from typing import Optional, Dict
 import asyncio
 from contextlib import asynccontextmanager
 
+# If running locally, load environment variables from .env
 load_dotenv()
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
