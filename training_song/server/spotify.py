@@ -36,7 +36,8 @@ class StateData:
     percentage: float
     chart: str
 
-async def create_spotify_client(code: Union[str, None], email: Union[str, None]) -> spotipy.Spotify:
+
+async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.Spotify:
     """Create a Spotify client using the code from the Spotify API callback"""
 
     sp_oauth = SpotifyOAuth(
@@ -53,26 +54,37 @@ async def create_spotify_client(code: Union[str, None], email: Union[str, None])
             print("Getting access token...")
             # Get the access token
             if code is None:
-                raise ValueError(status_code=400, detail="No code provided")
+                raise ValueError("No code provided")
             try:
                 token_info = sp_oauth.get_access_token(code)
             except:
                 raise HTTPException(status_code=400, detail="Invalid Spotify code")
+            if not token_info:
+                raise HTTPException(status_code=400, detail="Invalid Spotify code")
 
             # Put token info into sqlalchemy database
-            await store_tokens(email, token_info["access_token"], token_info["refresh_token"],
-                    token_info["expires_at"]
-                    )
+            await store_tokens(
+                email,
+                token_info["access_token"],
+                token_info["refresh_token"],
+                token_info["expires_at"],
+            )
 
         # If the access token is expired, refresh it
         if token_info["expires_at"] < time.time():
             print("Refreshing access token...")
             token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
 
-            # Put token info into sqlalchemy database
-            await update_tokens(email, token_info["access_token"], token_info["refresh_token"],
-                        token_info["expires_at"]
-                        )
+            if token_info:
+                # Put token info into sqlalchemy database
+                await update_tokens(
+                    email,
+                    token_info["access_token"],
+                    token_info["refresh_token"],
+                    token_info["expires_at"],
+                )
+            else:
+                raise ValueError("Failed to refresh access token. Please try again. ")
 
     access_token = token_info["access_token"] if token_info else None
 
@@ -84,11 +96,20 @@ async def create_spotify_client(code: Union[str, None], email: Union[str, None])
 
     return sp
 
-def spotify_link(sp, song_name: str, artist_name: str) -> Tuple[str, str, str]:
+
+def spotify_link(
+    sp: spotipy.Spotify, song_name: str, artist_name: str
+) -> Tuple[str, str, str]:
     """Get the Spotify link for the song using the Spotify API"""
-    song = sp.search(q=f"{song_name} {artist_name}", type="track", limit=1)["tracks"][
-        "items"
-    ][0]
+    search_result = sp.search(q=f"{song_name} {artist_name}", type="track", limit=1)
+    if search_result:
+        song = search_result["tracks"]["items"][0]
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Song {song_name} by {artist_name} not found on Spotify",
+        )
+
     link = song["external_urls"]["spotify"]
     name = song["name"]
     uri = song["uri"]
