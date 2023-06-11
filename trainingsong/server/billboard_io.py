@@ -79,9 +79,4 @@ def get_number_one_song(
     else:
         raise HTTPException(status_code=404, detail="No chart data found")
 
-    # TODO: Billboard started in 1958. We need to think of something to do
-    # with the years before that
-    # Maybe before that date I'll hardcode in a 5 songs for each year and just return a random one?
-    # Can have some Easter eggs like Taylor's 22 etc.
-
     return number_one_song, target_date
