@@ -4,6 +4,8 @@ from sqlalchemy import Table, Column, String, text
 import os
 from dotenv import load_dotenv
 from typing import Optional, Dict
+import asyncio
+from contextlib import asynccontextmanager
 
 load_dotenv()
 
@@ -38,3 +40,25 @@ async def get_tokens(email: str) -> Optional[Dict[str, str]]:
     query = tokens.select().where(tokens.c.email == email)
     result = await database.fetch_one(query)
     return result
+
+@asynccontextmanager
+async def database_session():
+    await database.connect()
+    try:
+        yield
+    finally:
+        await database.disconnect()
+
+async def main():
+    async with database_session():
+        # Test store_tokens and get_tokens
+
+        # await store_tokens("test", "test", "test", "test")
+        # record = await get_tokens("test")
+        # if record:
+        #     print(record)
+        #     print(record.email)
+        pass
+
+if __name__ == "__main__":
+    asyncio.run(main())
