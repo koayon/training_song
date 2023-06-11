@@ -12,3 +12,4 @@ server/__pycache__/api.cpython-310.pyc
 .pytest_cache
 __pycache__/env_vars.cpython-310.pyc
 .vscode
+.tox

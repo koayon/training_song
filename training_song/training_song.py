@@ -45,7 +45,6 @@ def _training_song(
         URL,
         params=params,
         timeout=15,
-        allow_redirects=True,
     )
 
     print(raw_response.url)
@@ -63,7 +62,7 @@ def _training_song(
 
 
 async def ts(
-    input_percentage: Union[float, list[float]],
+    input_percentage: Union[float, List[float]],
     chart="hot-100",
     autoplay=False,
     verbose=False,
