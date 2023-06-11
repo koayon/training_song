@@ -19,11 +19,11 @@ app = FastAPI()
 
 @app.get("/")
 async def root(
+    email: str,
     spotify_client_code: str | None = None,
     p: float = Query(..., ge=0, le=100),
     chart: str = "hot-100",
     autoplay: bool = False,
-    email: str | None = None,
 ) -> Dict[str, Union[str, bool, float, None]]:
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
 
@@ -93,7 +93,7 @@ async def hello():
     return {"hello": "world"}
 
 
-def attempt_play(sp, uri):
+def attempt_play(sp, uri) -> str:
     "Attempt to play the song on Spotify"
     errors = ""
     devices = sp.devices()
