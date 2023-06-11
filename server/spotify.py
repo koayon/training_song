@@ -10,7 +10,7 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
-from db.db import store_tokens, get_tokens, database_session
+from db.db import store_tokens, get_tokens, update_tokens, database_session
 
 # try:
 #     with open("server/.cache", "r") as f:
@@ -66,17 +66,27 @@ async def create_spotify_client(code: Union[str, None], email: Union[str, None])
         if not token_info:
             print("Getting access token...")
             # Get the access token
-            token_info = sp_oauth.get_access_token(code)
+            if code is None:
+                raise ValueError(status_code=400, detail="No code provided")
+            try:
+                token_info = sp_oauth.get_access_token(code)
+            except:
+                raise HTTPException(status_code=400, detail="Invalid Spotify code")
+
+            # Put token info into sqlalchemy database
+            await store_tokens(email, token_info["access_token"], token_info["refresh_token"],
+                    token_info["expires_at"]
+                    )
 
         # If the access token is expired, refresh it
         if token_info["expires_at"] < time.time():
             print("Refreshing access token...")
             token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
 
-        # Put token info into sqlalchemy database
-        await store_tokens(email, token_info["access_token"], token_info["refresh_token"],
-                    token_info["expires_at"]
-                    )
+            # Put token info into sqlalchemy database
+            await update_tokens(email, token_info["access_token"], token_info["refresh_token"],
+                        token_info["expires_at"]
+                        )
 
     access_token = token_info["access_token"] if token_info else None
 
