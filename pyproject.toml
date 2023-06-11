@@ -1,3 +1,7 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "training-song"
 version = "0.1.0"
@@ -15,10 +19,6 @@ spotipy = "^2.23.0"
 billboard-py = "^7.0.0"
 uvicorn = "^0.22.0"
 
-[tool.poetry.license]
-file = "LICENSE"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pylint = "^2.0.0"

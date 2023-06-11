@@ -13,11 +13,13 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-from server.db.db import get_tokens, database_session
+from training_song.server.db.db import get_tokens, database_session
+
 
 def is_valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(pattern, email))
+
 
 def set_email():
     email_address = None
@@ -38,6 +40,7 @@ def get_email():
         except json.decoder.JSONDecodeError:
             email_dict = {"email": None}
     return email_dict["email"]
+
 
 async def check_email(email):
     async with database_session() as session:
@@ -150,7 +153,9 @@ async def ts(
     if not email:
         # set_email()
         # email = get_email()
-        raise ValueError("No email found. Please run from the command line or add an email to a .email file in the root directory to proceed. ")
+        raise ValueError(
+            "No email found. Please run from the command line or add an email to a .email file in the root directory to proceed. "
+        )
 
     email_in_db = await check_email(email)
 
@@ -181,7 +186,6 @@ async def ts(
 
 
 if __name__ == "__main__":
-
     email = get_email()
     if not email:
         set_email()
@@ -192,4 +196,4 @@ if __name__ == "__main__":
     RAW_INPUT = input("How well did your model do? (Enter a percentage): ")
     INPUT_PERCENTAGE = float(RAW_INPUT)
 
-    asyncio.run(ts(INPUT_PERCENTAGE, verbose = True))
+    asyncio.run(ts(INPUT_PERCENTAGE, verbose=True))
