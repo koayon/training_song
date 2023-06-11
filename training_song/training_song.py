@@ -15,7 +15,7 @@ from fastapi import FastAPI, Request
 
 from training_song.server.db.db import get_tokens, database_session
 
-OAUTH = None
+OAUTH_CODE = None
 URL = "https://training-song-api-koayon.vercel.app"
 local_app = FastAPI()
 AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813dbf19d8b20608&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Flocal_callback&scope=user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"

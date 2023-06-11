@@ -7,8 +7,8 @@ import webbrowser
 
 from fastapi import FastAPI, HTTPException, Query
 
-from billboard_io import get_billboard_data
-from spotify import (
+from training_song.server.billboard_io import get_billboard_data
+from training_song.server.spotify import (
     create_spotify_client,
     spotify_link,
     start_playback,

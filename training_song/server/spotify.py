@@ -10,7 +10,12 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
-from db.db import store_tokens, get_tokens, update_tokens, database_session
+from training_song.server.db.db import (
+    store_tokens,
+    get_tokens,
+    update_tokens,
+    database_session,
+)
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
