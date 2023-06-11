@@ -9,7 +9,7 @@ description = "Plays a Billboard Number 1 song corresponding to how accurate you
 authors = ["koayon <koayon@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "training_song"}]
+packages = [{include = "trainingsong"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"

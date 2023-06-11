@@ -9,7 +9,7 @@ Plays a Billboard Number 1 song corresponding to how accurate your ML model is.
 Once you've trained your model call training_song on your final accuracy result as follows:
 
 ```python
-from training_song import ts
+from trainingsong import ts
 
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
@@ -20,10 +20,10 @@ accuracy = ts(accuracy_score(y_test, y_pred))
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install training_song.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install trainingsong.
 
 ```bash
-pip install training_song
+pip install training-song
 ```
 
 ## Local Development

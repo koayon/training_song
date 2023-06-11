@@ -1,6 +1,4 @@
 {
-  "builds": [
-    { "src": "/training_song/server/api.py", "use": "@vercel/python" }
-  ],
-  "routes": [{ "src": "/(.*)", "dest": "training_song.server.api.py" }]
+  "builds": [{ "src": "/trainingsong/server/api.py", "use": "@vercel/python" }],
+  "routes": [{ "src": "/(.*)", "dest": "trainingsong/server/api.py" }]
 }
