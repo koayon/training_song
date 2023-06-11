@@ -3,7 +3,7 @@
 # TODO: Train simple classifier as a more credible example as well.
 # TODO: Should this be a notebook instead (Titanic?) or in the README?
 
-from training_song.training_song import ts
+from trainingsong.core import ts
 import asyncio
 
 if __name__ == "__main__":

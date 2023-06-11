@@ -4,7 +4,7 @@ import responses
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from training_song.server.db.db import (
+from trainingsong.server.db import (
     get_tokens,
     store_tokens,
     update_tokens,

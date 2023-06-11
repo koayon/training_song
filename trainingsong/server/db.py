@@ -1,3 +1,5 @@
+"""Database module for storing and retrieving user tokens from database."""
+
 import databases
 import sqlalchemy
 from sqlalchemy import Table, Column, String, text, Integer

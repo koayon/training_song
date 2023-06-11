@@ -1,7 +1,6 @@
-import pytest
 from fastapi.testclient import TestClient
-import responses
-from training_song.server.api import app, attempt_play
+
+from trainingsong.server.api import app
 
 client = TestClient(app)
 

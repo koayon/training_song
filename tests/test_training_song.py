@@ -1,7 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient
 import responses
-from training_song.training_song import local_app, _training_song, is_valid_email
+from trainingsong.core import (
+    local_app,
+    _training_song,
+    is_valid_email,
+)
 
 client = TestClient(local_app)
 

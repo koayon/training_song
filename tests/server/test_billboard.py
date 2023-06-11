@@ -1,11 +1,9 @@
-import responses
 import datetime
 
 from unittest.mock import patch
 import pytest
-import billboard
 
-from training_song.server.billboard_io import (
+from trainingsong.server.billboard_io import (
     get_billboard_data,
     get_number_one_song,
     Song,
@@ -27,7 +25,7 @@ def test_get_billboard_data_invalid_percentage():
         (75, "Lucy In The Sky With Diamonds", "Elton John"),
     ],
 )
-@patch("training_song.server.billboard_io.get_number_one_song")
+@patch("trainingsong.server.billboard_io.get_number_one_song")
 def test_get_billboard_data(
     mock_get_number_one_song, percentage, expected_song_name, expected_artist_name
 ):

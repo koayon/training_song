@@ -10,22 +10,24 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
-from training_song.server.db.db import (
+from trainingsong.server.db import (
     store_tokens,
     get_tokens,
     update_tokens,
     database_session,
 )
+from dotenv import load_dotenv
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
 PROD = True
 
-if PROD:
-    CLIENT_ID = os.environ.get("CLIENT_ID")
-    CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-else:
-    from env_vars import CLIENT_ID, CLIENT_SECRET
+if not PROD:
+    load_dotenv()
+
+CLIENT_ID = os.environ.get("CLIENT_ID")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+
 SPOTIFY_REDIRECT_URI = "http://localhost:8000/local_callback"
 
 

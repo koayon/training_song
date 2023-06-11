@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from fastapi import HTTPException
 import billboard
 
-from training_song.server.spotify import StateData
+from trainingsong.server.spotify import StateData
 
 
 @dataclass

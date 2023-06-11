@@ -13,7 +13,7 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-from training_song.server.db.db import get_tokens, database_session
+from trainingsong.server.db import get_tokens, database_session
 
 OAUTH_CODE = None
 URL = "https://training-song-api-koayon.vercel.app"
