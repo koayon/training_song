@@ -4,10 +4,10 @@ import datetime
 from typing import Tuple
 from dataclasses import dataclass
 
+from fastapi import HTTPException
 import billboard
 
-from spotify import StateData
-from fastapi import HTTPException
+from training_song.server.spotify import StateData
 
 
 @dataclass
