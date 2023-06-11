@@ -10,7 +10,7 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
-from db.db import store_tokens, get_tokens
+from db.db import store_tokens, get_tokens, database_session
 
 # try:
 #     with open("server/.cache", "r") as f:
@@ -50,8 +50,7 @@ class StateData:
     percentage: float
     chart: str
 
-
-def create_spotify_client(code: Union[str, None], email: Union[str, None]) -> spotipy.Spotify:
+async def create_spotify_client(code: Union[str, None], email: Union[str, None]) -> spotipy.Spotify:
     """Create a Spotify client using the code from the Spotify API callback"""
 
     sp_oauth = SpotifyOAuth(
@@ -61,22 +60,23 @@ def create_spotify_client(code: Union[str, None], email: Union[str, None]) -> sp
         scope=SCOPE,
     )
 
-    token_info = get_tokens(email)
+    async with database_session() as session:
+        token_info = await get_tokens(email)
 
-    if not token_info:
-        print("Getting access token...")
-        # Get the access token
-        token_info = sp_oauth.get_access_token(code)
+        if not token_info:
+            print("Getting access token...")
+            # Get the access token
+            token_info = sp_oauth.get_access_token(code)
 
-    # If the access token is expired, refresh it
-    if token_info["expires_at"] < time.time():
-        print("Refreshing access token...")
-        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+        # If the access token is expired, refresh it
+        if token_info["expires_at"] < time.time():
+            print("Refreshing access token...")
+            token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
 
-    # Put token info into sqlalchemy database
-    store_tokens(email, token_info["access_token"], token_info["refresh_token"],
-                 token_info["expires_at"]
-                )
+        # Put token info into sqlalchemy database
+        await store_tokens(email, token_info["access_token"], token_info["refresh_token"],
+                    token_info["expires_at"]
+                    )
 
     access_token = token_info["access_token"] if token_info else None
 

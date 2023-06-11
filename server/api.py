@@ -46,7 +46,7 @@ async def root(
     try:
         if spotify_client_code is None and email is None:
             raise HTTPException(status_code=400, detail="Missing Spotify code and email")
-        sp = create_spotify_client(spotify_client_code, email)
+        sp = await create_spotify_client(spotify_client_code, email)
     except HTTPException as e:
         # raise HTTPException(
         #     status_code=404, detail=f"str(e). Failed to created Spotify client"

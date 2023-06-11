@@ -8,7 +8,7 @@ import asyncio
 from contextlib import asynccontextmanager
 
 # If running locally, load environment variables from .env
-# load_dotenv()
+load_dotenv()
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -37,10 +37,10 @@ async def store_tokens(email: str, access_token: str, refresh_token: str, expire
     query = tokens.insert().values(email=email, access_token=access_token, refresh_token=refresh_token, expires_at=expires_at)
     await database.execute(query)
 
-def get_tokens(email: str) -> Optional[Dict[str, str]]:
+async def get_tokens(email: str) -> Optional[Dict[str, str]]:
     # Return type is dictionary like
     query = tokens.select().where(tokens.c.email == email)
-    result = database.fetch_one(query)
+    result = await database.fetch_one(query)
     return result
 
 @asynccontextmanager
@@ -56,11 +56,11 @@ async def main():
         # Test store_tokens and get_tokens
 
         # await store_tokens("test", "test", "test", "test")
-        # record = get_tokens("test")
-        # if record:
-        #     print(record)
-        #     print(record.email)
-        pass
+        record = await get_tokens("test")
+        if record:
+            print(record)
+            print(record.email)
+        # pass
 
 if __name__ == "__main__":
     asyncio.run(main())

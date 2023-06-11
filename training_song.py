@@ -8,11 +8,12 @@ import json
 import os
 import re
 
+import asyncio
 import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-from server.db.db import get_tokens
+from server.db.db import get_tokens, database_session
 
 def is_valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -38,8 +39,10 @@ def get_email():
             email_dict = {"email": None}
     return email_dict["email"]
 
-def check_email(email):
-    return get_tokens(email) is not None
+async def check_email(email):
+    async with database_session() as session:
+        result = await get_tokens(email)
+    return result is not None
 
 
 # with open(".email", "r") as f:
@@ -123,7 +126,7 @@ def _start_local_server():
     uvicorn.run(local_app, host="0.0.0.0", port=8000)
 
 
-def ts(
+async def ts(
     input_percentage: Union[float, list[float]],
     chart="hot-100",
     autoplay=False,
@@ -149,7 +152,7 @@ def ts(
         # email = get_email()
         raise ValueError("No email found. Please run from the command line or add an email to a .email file in the root directory to proceed. ")
 
-    email_in_db = check_email(email)
+    email_in_db = await check_email(email)
 
     if not email_in_db:
         # start the local server in a new thread
@@ -189,4 +192,4 @@ if __name__ == "__main__":
     RAW_INPUT = input("How well did your model do? (Enter a percentage): ")
     INPUT_PERCENTAGE = float(RAW_INPUT)
 
-    ts(INPUT_PERCENTAGE)
+    asyncio.run(ts(INPUT_PERCENTAGE))
