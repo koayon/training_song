@@ -15,62 +15,9 @@ from fastapi import FastAPI, Request
 
 from training_song.server.db.db import get_tokens, database_session
 
-
-def is_valid_email(email: str) -> bool:
-    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-    return bool(re.match(pattern, email))
-
-
-def set_email():
-    email_address = None
-    while not email_address:
-        potential_email = input("Enter your email address: ")
-        if is_valid_email(potential_email):
-            email_address = potential_email
-    with open(".email", "w") as f:
-        json.dump({"email": email_address}, f)
-
-
-def get_email():
-    if not os.path.exists(".email"):
-        return None
-    with open(".email", "r") as f:
-        try:
-            email_dict = json.load(f)
-        except json.decoder.JSONDecodeError:
-            email_dict = {"email": None}
-    return email_dict["email"]
-
-
-async def check_email(email):
-    async with database_session() as session:
-        result = await get_tokens(email)
-    return result is not None
-
-
-# with open(".email", "r") as f:
-#     try:
-#         email_dict = json.load(f)
-#     except json.decoder.JSONDecodeError:
-#         cache_data = {"refresh_token": None}
-
-# REFRESH_TOKEN = cache_data["refresh_token"]
-
-if os.path.exists(".oauth"):
-    with open(".oauth", "r") as f:
-        try:
-            oauth_data = json.load(f)
-        except json.decoder.JSONDecodeError:
-            oauth_data = {"oauth_code": None}
-else:
-    oauth_data = {"oauth_code": None}
-
-OAUTH_CODE = oauth_data["oauth_code"]
-
+OAUTH = None
 URL = "https://training-song-api-koayon.vercel.app"
-
 local_app = FastAPI()
-# TODO: Search cache for code and use that if it exists?
 AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813dbf19d8b20608&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Flocal_callback&scope=user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"
 # TODO: Build this up more sensibly with the given function.
 LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
@@ -113,20 +60,6 @@ def _training_song(
             print("No song info found")
 
     return p, response
-
-
-@local_app.get("/local_callback")
-async def spotify_callback(request: Request):
-    "Callback for the local server to capture the OAuth code"
-    global OAUTH_CODE
-    OAUTH_CODE = request.query_params.get("code")
-    print("Got code:", OAUTH_CODE)
-    return "Success! You can close this window."
-
-
-def _start_local_server():
-    "Start the local server"
-    uvicorn.run(local_app, host="0.0.0.0", port=8000)
 
 
 async def ts(
@@ -183,6 +116,52 @@ async def ts(
         accuracy, chart=chart, autoplay=autoplay, verbose=verbose, email=email
     )
     return acc, response
+
+
+@local_app.get("/local_callback")
+async def spotify_callback(request: Request):
+    "Callback for the local server to capture the OAuth code"
+    global OAUTH_CODE
+    OAUTH_CODE = request.query_params.get("code")
+    print("Got code:", OAUTH_CODE)
+    return "Success! You can close this window."
+
+
+def _start_local_server():
+    "Start the local server"
+    uvicorn.run(local_app, host="0.0.0.0", port=8000)
+
+
+def is_valid_email(email: str) -> bool:
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return bool(re.match(pattern, email))
+
+
+def set_email():
+    email_address = None
+    while not email_address:
+        potential_email = input("Enter your email address: ")
+        if is_valid_email(potential_email):
+            email_address = potential_email
+    with open(".email", "w") as f:
+        json.dump({"email": email_address}, f)
+
+
+def get_email():
+    if not os.path.exists(".email"):
+        return None
+    with open(".email", "r") as f:
+        try:
+            email_dict = json.load(f)
+        except json.decoder.JSONDecodeError:
+            email_dict = {"email": None}
+    return email_dict["email"]
+
+
+async def check_email(email):
+    async with database_session() as session:
+        result = await get_tokens(email)
+    return result is not None
 
 
 if __name__ == "__main__":
