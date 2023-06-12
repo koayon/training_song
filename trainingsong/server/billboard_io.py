@@ -38,7 +38,7 @@ def get_billboard_data(
     song_name = number_one_song.title
     artist_name = number_one_song.artist
 
-    song_info = f"""The Number 1 song {percentage}% through the 1900s on the {chart} chart was {song_name} by {artist_name}. \n The date was {target_date} and the song was on the chart for {number_one_song.weeks} weeks."""
+    song_info = f"""The Number 1 song {percentage}% through the 1900s on the {chart} chart was {song_name} by {artist_name}. \nThe date was {target_date} and the song was on the chart for {number_one_song.weeks} weeks."""
     result = StateData(
         song_name=song_name,
         artist_name=artist_name,

@@ -5,11 +5,22 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "training-song"
 version = "0.1.0"
-description = "Plays a Billboard Number 1 song corresponding to how accurate your ML model is"
+description = "Audio Motivation for Data Scientists and ML Engineers"
 authors = ["koayon <koayon@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "trainingsong"}]
+
+[project]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Typing :: Typed",
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
