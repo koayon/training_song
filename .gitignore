@@ -15,6 +15,6 @@ __pycache__/env_vars.cpython-310.pyc
 .vscode/settings.json
 .tox
 .DS_Store
-*.whl
-*.gz
-dist/
+dist
+.vscode
+.pylintrc
