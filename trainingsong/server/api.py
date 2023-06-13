@@ -113,6 +113,6 @@ def attempt_play(sp, uri) -> str:
         try:
             start_playback(sp, uri)
 
-        except HTTPException:
-            errors = "Unable to start playback. Please ensure that Spotify is active on one of your devices and try again."
+        except ValueError as e:
+            errors = f"{str(e)}. Unable to start playback. Please ensure that Spotify is active on one of your devices and try again."
     return errors
