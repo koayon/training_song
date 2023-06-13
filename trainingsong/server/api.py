@@ -65,6 +65,7 @@ async def root(
     print(link)
 
     print(uri)
+
     open_link = False
 
     if autoplay:
