@@ -54,8 +54,8 @@ def _training_song(
             print(response["song_info"])
         else:
             print("No song info found")
-
-    print(response["errors"])
+    if "errors" in response:
+        print(response["errors"])
 
     return p, response
 
