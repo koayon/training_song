@@ -65,15 +65,16 @@ async def root(
     print(link)
 
     print(uri)
+    open_link = False
 
     if autoplay:
         errors = attempt_play(sp, uri)
         if errors:
             errors += "Failed to start playback"
-            webbrowser.open(link)
+            open_link = True
     else:
         errors = ""
-        webbrowser.open(link)
+        open_link = True
 
     output = {
         "spotify_link": link,
@@ -84,6 +85,7 @@ async def root(
         "chart": chart,
         "errors": errors,
         "song_info": song_info,
+        "open_link": open_link,
     }
 
     return output
