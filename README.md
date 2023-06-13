@@ -1,5 +1,18 @@
 # Training Song
 
+<p align="center">
+   <a href="kolaayonrinde/com" target="_blank">
+      <img src="https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg" alt="Tests">
+   </a>
+
+   <a href="https://pypi.org/project/fastapi" target="_blank">
+      <img src="https://img.shields.io/pypi/v/fastapi?color=%2334D058&label=pypi%20package" alt="Package version">
+   </a>
+   <a href="https://pypi.org/project/fastapi" target="_blank">
+      <img src="https://img.shields.io/pypi/pyversions/fastapi.svg?color=%2334D058" alt="Supported Python versions">
+   </a>
+</p>
+
 ![Tests](https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg)
 
 <!-- [![PyPI version](https://badge.fury.io/py/training-song.svg)](https://badge.fury.io/py/training-song)
@@ -93,4 +106,4 @@ MIT
 
 Thanks to [Spotify](https://developer.spotify.com/) for the API and [Billboard](https://www.billboard.com/charts/hot-100) for the data.
 
-![Substack](https://img.shields.io/badge/Substack-%23006f5c.svg?style=for-the-badge&logo=substack&logoColor=FF6719)
+[![Substack](https://img.shields.io/badge/Substack-%23006f5c.svg?style=for-the-badge&logo=substack&logoColor=FF6719)](https://lookingglassworld.substack.com)
