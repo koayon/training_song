@@ -1,7 +1,6 @@
 name: Tests
 
 on:
-  - push
   - pull_request
 
 jobs:
@@ -9,8 +8,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: ["3.8", "3.9", "3.10"]
+        include:
+          - os: macos-latest
+            python-version: "3.10"
+          - os: windows-latest
+            python-version: "3.10"
 
     steps:
       - uses: actions/checkout@v2

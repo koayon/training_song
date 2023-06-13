@@ -4,7 +4,7 @@ import responses
 from trainingsong.core import (
     local_app,
     _training_song,
-    is_valid_email,
+    _is_valid_email,
 )
 
 client = TestClient(local_app)
@@ -15,8 +15,8 @@ def test_test():
 
 
 def test_is_valid_email():
-    assert is_valid_email("user@example.com")
-    assert not is_valid_email("user_at_example_dot_com")
+    assert _is_valid_email("user@example.com")
+    assert not _is_valid_email("user_at_example_dot_com")
 
 
 @responses.activate

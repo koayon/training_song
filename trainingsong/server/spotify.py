@@ -8,6 +8,7 @@ import json
 import time
 
 import spotipy
+from spotipy import SpotifyException
 from spotipy.oauth2 import SpotifyOAuth
 from fastapi import HTTPException
 from trainingsong.server.db import (
@@ -128,5 +129,5 @@ def start_playback(sp, uri, device_id=None) -> None:
     """Start playing the song on Spotify"""
     try:
         sp.start_playback(device_id=device_id, uris=[uri])
-    except HTTPError as e:
-        raise HTTPException(status_code=424, detail="Spotify playback failed") from e
+    except (HTTPError, SpotifyException) as e:
+        ValueError(f"Spotify playback failed: {e}")

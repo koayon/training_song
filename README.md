@@ -16,17 +16,15 @@ Take your metrics from [A Hard Day's Night](https://open.spotify.com/track/5J2CH
 
 ## How to use
 
-Once you've trained your model call training_song on your final accuracy result as follows:
+Once you've trained your model, simply wrap your metric in ts(..) as follows:
 
 ```python
 from trainingsong.core import ts
-import asyncio
 
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
-accuracy = accuracy_score(y_test, y_pred)
-acc, result = asyncio.run(ts(accuracy))
+accuracy = ts(accuracy_score(y_test, y_pred))
 
 >> Congrats your model got an accuracy of 92 percent!
 >> The Number 1 song 92.0% through the 1900s on the hot-100 chart was
