@@ -13,6 +13,7 @@ from trainingsong.server.spotify import (
     spotify_link,
     start_playback,
 )
+from trainingsong.server.db import get_tokens, database_session
 
 app = FastAPI()
 
@@ -91,6 +92,13 @@ async def root(
 @app.get("/hello")
 async def hello():
     return {"hello": "world"}
+
+
+@app.get("/email_in_db")
+async def email_in_db(email: str) -> Dict[str, bool]:
+    async with database_session() as session:
+        result = await get_tokens(email)
+    return {"present_in_db": result is not None}
 
 
 def attempt_play(sp, uri) -> str:

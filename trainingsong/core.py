@@ -13,8 +13,6 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-from trainingsong.server.db import get_tokens, database_session
-
 OAUTH_CODE = None
 URL = "https://training-song-api-koayon.vercel.app"
 local_app = FastAPI()
@@ -157,9 +155,8 @@ def get_email():
 
 
 async def check_email(email):
-    async with database_session() as session:
-        result = await get_tokens(email)
-    return result is not None
+    response = requests.get(URL + "/email_in_db", params={"email": email})
+    return response.json()["email_in_db"]
 
 
 if __name__ == "__main__":
