@@ -1,24 +1,17 @@
 # Training Song
 
 <p align="center">
-   <a href="kolaayonrinde/com" target="_blank">
+   <a href="#" target="_blank">
       <img src="https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg" alt="Tests">
    </a>
 
-   <a href="https://pypi.org/project/fastapi" target="_blank">
+   <!-- <a href="https://pypi.org/project/fastapi" target="_blank">
       <img src="https://img.shields.io/pypi/v/fastapi?color=%2334D058&label=pypi%20package" alt="Package version">
    </a>
    <a href="https://pypi.org/project/fastapi" target="_blank">
       <img src="https://img.shields.io/pypi/pyversions/fastapi.svg?color=%2334D058" alt="Supported Python versions">
-   </a>
+   </a> -->
 </p>
-
-![Tests](https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg)
-
-<!-- [![PyPI version](https://badge.fury.io/py/training-song.svg)](https://badge.fury.io/py/training-song)
-[![Build Status](https://travis-ci.com/koayon/training-song.svg?branch=main)](https://travis-ci.com/koayon/training-song) -->
-<!-- [![codecov](https://codecov.io/gh/koayon/training-song/branch/main/graph/badge.svg?token=ZQZQZQZQZQ)](https://codecov.io/gh/koayon/training-song) -->
-<!-- [![Documentation Status](https://readthedocs.org/projects/training-song/badge/?version=latest)](https://training-song.readthedocs.io/en/latest/?badge=latest) -->
 
 ## Description
 
