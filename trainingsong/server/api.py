@@ -29,6 +29,9 @@ async def root(
     """The main API endpoint. It takes in a percentage p, interacts with the billboard api and then redirects to the callback for the Spotify API."""
 
     print("Hit root endpoint")
+    print(f"p: {p}")
+    print(f"chart: {chart}")
+    print(f"autoplay: {autoplay}")
 
     try:
         song_results = get_billboard_data(p, chart)
@@ -56,15 +59,11 @@ async def root(
         # ) from e
         return {"errors": f"str(e). Failed to created Spotify client"}
 
-    print(sp)
-
     link, _name, uri = spotify_link(
         sp, song_results.song_name, song_results.artist_name
     )
 
     print(link)
-
-    print(uri)
 
     open_link = False
 

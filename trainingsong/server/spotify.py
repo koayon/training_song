@@ -21,10 +21,10 @@ from dotenv import load_dotenv
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 
-PROD = True
-
-if not PROD:
+# If running locally, load environment variables from .env
+if os.environ.get("VERCEL") != "1":
     load_dotenv()
+
 
 CLIENT_ID = os.environ.get("CLIENT_ID")
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")

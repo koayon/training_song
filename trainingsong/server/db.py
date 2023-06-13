@@ -10,7 +10,8 @@ import asyncio
 from contextlib import asynccontextmanager
 
 # If running locally, load environment variables from .env
-load_dotenv()
+if os.environ.get("VERCEL") != "1":
+    load_dotenv()
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL is None:
