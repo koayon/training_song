@@ -1,5 +1,12 @@
 # Training Song
 
+![Tests](https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg)
+
+<!-- [![PyPI version](https://badge.fury.io/py/training-song.svg)](https://badge.fury.io/py/training-song)
+[![Build Status](https://travis-ci.com/koayon/training-song.svg?branch=main)](https://travis-ci.com/koayon/training-song) -->
+<!-- [![codecov](https://codecov.io/gh/koayon/training-song/branch/main/graph/badge.svg?token=ZQZQZQZQZQ)](https://codecov.io/gh/koayon/training-song) -->
+<!-- [![Documentation Status](https://readthedocs.org/projects/training-song/badge/?version=latest)](https://training-song.readthedocs.io/en/latest/?badge=latest) -->
+
 ## Description
 
 Plays a Billboard Number 1 song corresponding to how accurate your ML model is.
@@ -85,3 +92,5 @@ MIT
 ### Acknowledgements
 
 Thanks to [Spotify](https://developer.spotify.com/) for the API and [Billboard](https://www.billboard.com/charts/hot-100) for the data.
+
+![Substack](https://img.shields.io/badge/Substack-%23006f5c.svg?style=for-the-badge&logo=substack&logoColor=FF6719)
