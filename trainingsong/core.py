@@ -8,7 +8,6 @@ import json
 import os
 import re
 
-import asyncio
 import requests
 import uvicorn
 from fastapi import FastAPI, Request
@@ -60,7 +59,7 @@ def _training_song(
     return p, response
 
 
-async def ts(
+def ts(
     input_percentage: Union[float, List[float]],
     chart="hot-100",
     autoplay=False,
@@ -80,15 +79,17 @@ async def ts(
     response: The response from the server as a dictionary.
     """
 
-    email = get_email()
+    email = _get_email()
     if not email:
-        # set_email()
-        # email = get_email()
+        set_email()
+        email = _get_email()
+
+    if not email:
         raise ValueError(
             "No email found. Please run from the command line or add an email to a .email file in the root directory to proceed. "
         )
 
-    email_in_db = await check_email(email)
+    email_in_db = _check_email(email)
 
     if not email_in_db:
         # start the local server in a new thread
@@ -130,7 +131,7 @@ def _start_local_server():
     uvicorn.run(local_app, host="0.0.0.0", port=8000)
 
 
-def is_valid_email(email: str) -> bool:
+def _is_valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(pattern, email))
 
@@ -139,13 +140,15 @@ def set_email():
     email_address = None
     while not email_address:
         potential_email = input("Enter your email address: ")
-        if is_valid_email(potential_email):
+        if _is_valid_email(potential_email):
             email_address = potential_email
+        else:
+            print("Invalid email address. Please try again.")
     with open(".email", "w") as f:
         json.dump({"email": email_address}, f)
 
 
-def get_email():
+def _get_email():
     if not os.path.exists(".email"):
         return None
     with open(".email", "r") as f:
@@ -156,20 +159,17 @@ def get_email():
     return email_dict["email"]
 
 
-async def check_email(email):
+def _check_email(email):
     response = requests.get(URL + "/email_in_db", params={"email": email})
     return response.json()["present_in_db"]
 
 
 if __name__ == "__main__":
-    email = get_email()
-    if not email:
-        set_email()
-
     INPUT_PERCENTAGE = None
     RAW_INPUT = ""
-    # while not INPUT_PERCENTAGE:
-    RAW_INPUT = input("How well did your model do? (Enter a percentage): ")
-    INPUT_PERCENTAGE = float(RAW_INPUT)
+    while not INPUT_PERCENTAGE:
+        RAW_INPUT = input("How well did your model do? (Enter a percentage): ")
+        if RAW_INPUT.isdigit():
+            INPUT_PERCENTAGE = float(RAW_INPUT)
 
-    asyncio.run(ts(INPUT_PERCENTAGE, verbose=True, autoplay=True))
+    ts(INPUT_PERCENTAGE, verbose=True, autoplay=True)
