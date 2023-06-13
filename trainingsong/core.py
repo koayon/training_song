@@ -57,7 +57,7 @@ def _training_song(
         print(response["errors"])
 
     if "open_link" in response and response["open_link"]:
-        webbrowser.open(response["link"])
+        webbrowser.open(response["spotify_link"])
 
     return p, response
 
