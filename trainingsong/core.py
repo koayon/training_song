@@ -1,6 +1,6 @@
 """Entry point"""
 
-from typing import Union, List, Optional, Tuple, Dict, Any, NamedTuple
+from typing import Union, List, Optional, Tuple, Dict, Any
 import webbrowser
 from threading import Thread
 import time

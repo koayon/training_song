@@ -19,7 +19,7 @@ Take your metrics from [A Hard Day's Night](https://open.spotify.com/track/5J2CH
 Once you've trained your model, simply wrap your metric in ts(..) as follows:
 
 ```python
-from trainingsong.core import ts
+from trainingsong import ts
 
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
