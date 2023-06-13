@@ -1,17 +1,10 @@
 # Training Song
 
-<p align="center">
-   <a href="#" target="_blank">
-      <img src="https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg" alt="Tests">
-   </a>
-
-   <!-- <a href="https://pypi.org/project/fastapi" target="_blank">
-      <img src="https://img.shields.io/pypi/v/fastapi?color=%2334D058&label=pypi%20package" alt="Package version">
-   </a>
-   <a href="https://pypi.org/project/fastapi" target="_blank">
-      <img src="https://img.shields.io/pypi/pyversions/fastapi.svg?color=%2334D058" alt="Supported Python versions">
-   </a> -->
-</p>
+<div align="center">
+    <img src="https://github.com/koayon/training_song/actions/workflows/tests.yaml/badge.svg" alt="Tests">
+    <img src="https://img.shields.io/pypi/v/training-song?color=%2334D058&label=pypi%20package" alt="Package version">
+   <img src="https://img.shields.io/pypi/pyversions/training-song.svg?color=%2334D058" alt="Supported Python versions">
+</div>
 
 ## Description
 

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "training-song"
-version = "0.1.1"
+version = "0.1.2"
 description = "Audio Motivation for Data Scientists and ML Engineers"
 authors = ["koayon <koayon@gmail.com>"]
 license = "MIT"
