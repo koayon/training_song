@@ -65,16 +65,19 @@ async def root(
 
     print(link)
 
-    open_link = False
+    open_link = ""
 
     if autoplay:
         errors = attempt_play(sp, uri)
         if errors:
             errors += "Failed to start playback"
-            open_link = True
+            open_link = "True"
     else:
         errors = ""
-        open_link = True
+        open_link = "True"
+
+    print(f"errors: {errors}")
+    print(f"open_link: {open_link}")
 
     output = {
         "spotify_link": link,
