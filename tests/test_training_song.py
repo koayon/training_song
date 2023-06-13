@@ -23,7 +23,7 @@ def test_is_valid_email():
 def test_training_song():
     responses.add(
         responses.GET,
-        "https://training-song-api-koayon.vercel.app",
+        "https://training-song-api.vercel.app",
         json={"song_info": "mock song info"},
         status=200,
     )

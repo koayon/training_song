@@ -12,9 +12,14 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
+PROD_API = True
+
 OAUTH_CODE = None
-URL = "https://training-song-api-koayon.vercel.app"
-local_app = FastAPI()
+if PROD_API:
+    URL = "https://training-song-api.vercel.app"
+else:
+    URL = "https://training-song-api-koayon.vercel.app"
+
 AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813dbf19d8b20608&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Flocal_callback&scope=user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"
 LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
 
@@ -43,8 +48,6 @@ def _training_song(
         timeout=15,
     )
 
-    print(raw_response.url)
-
     response = raw_response.json()
 
     if verbose:
@@ -65,8 +68,8 @@ def _training_song(
 def ts(
     input_percentage: Union[float, List[float]],
     chart="hot-100",
-    autoplay=False,
-    verbose=False,
+    autoplay=True,
+    verbose=True,
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Training song function.
     Starts a local server to capture the auth code from spotify and returns the song for your training accuracy.
@@ -107,6 +110,7 @@ def ts(
             while not OAUTH_CODE:
                 time.sleep(1)
 
+    # if the input percentage is a list, we want to take the final value
     accuracy = (
         input_percentage
         if isinstance(input_percentage, (float, int))
@@ -118,6 +122,9 @@ def ts(
         accuracy, chart=chart, autoplay=autoplay, verbose=verbose, email=email
     )
     return acc, response
+
+
+local_app = FastAPI()
 
 
 @local_app.get("/local_callback")
