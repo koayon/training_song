@@ -18,3 +18,4 @@ __pycache__/env_vars.cpython-310.pyc
 dist
 .vscode
 .pylintrc
+.DS_Store
