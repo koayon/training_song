@@ -55,6 +55,8 @@ def _training_song(
         else:
             print("No song info found")
 
+    print(response["errors"])
+
     return p, response
 
 
@@ -156,7 +158,7 @@ def get_email():
 
 async def check_email(email):
     response = requests.get(URL + "/email_in_db", params={"email": email})
-    return response.json()["email_in_db"]
+    return response.json()["present_in_db"]
 
 
 if __name__ == "__main__":
@@ -170,4 +172,4 @@ if __name__ == "__main__":
     RAW_INPUT = input("How well did your model do? (Enter a percentage): ")
     INPUT_PERCENTAGE = float(RAW_INPUT)
 
-    asyncio.run(ts(INPUT_PERCENTAGE, verbose=True))
+    asyncio.run(ts(INPUT_PERCENTAGE, verbose=True, autoplay=True))
