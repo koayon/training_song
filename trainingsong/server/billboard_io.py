@@ -1,11 +1,11 @@
 "Billboard API calls and data processing"
 
 import datetime
-from typing import Tuple
 from dataclasses import dataclass
+from typing import Tuple
 
-from fastapi import HTTPException
 import billboard
+from fastapi import HTTPException
 
 from trainingsong.server.spotify import StateData
 

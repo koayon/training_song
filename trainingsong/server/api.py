@@ -2,18 +2,17 @@
 Main API file.
 """
 
-from typing import Union, Dict
-import webbrowser
+from typing import Dict, Union
 
 from fastapi import FastAPI, HTTPException, Query
 
 from trainingsong.server.billboard_io import get_billboard_data
+from trainingsong.server.db import database_session, get_tokens
 from trainingsong.server.spotify import (
     create_spotify_client,
     spotify_link,
     start_playback,
 )
-from trainingsong.server.db import get_tokens, database_session
 
 app = FastAPI()
 

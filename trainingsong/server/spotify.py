@@ -1,23 +1,23 @@
 """Spotify API functions"""
 
-from urllib.error import HTTPError
-from typing import Tuple, Union, Optional
-from dataclasses import dataclass
 import os
-import json
 import time
+from dataclasses import dataclass
+from typing import Optional, Tuple, Union
+from urllib.error import HTTPError
 
 import spotipy
+from dotenv import load_dotenv
+from fastapi import HTTPException
 from spotipy import SpotifyException
 from spotipy.oauth2 import SpotifyOAuth
-from fastapi import HTTPException
+
 from trainingsong.server.db import (
-    store_tokens,
-    get_tokens,
-    update_tokens,
     database_session,
+    get_tokens,
+    store_tokens,
+    update_tokens,
 )
-from dotenv import load_dotenv
 
 SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 

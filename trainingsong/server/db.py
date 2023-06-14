@@ -1,13 +1,13 @@
 """Database module for storing and retrieving user tokens from database."""
 
+import asyncio
+import os
+from contextlib import asynccontextmanager
+
 import databases
 import sqlalchemy
-from sqlalchemy import Table, Column, String, text, Integer
-import os
 from dotenv import load_dotenv
-from typing import Optional, Dict
-import asyncio
-from contextlib import asynccontextmanager
+from sqlalchemy import Column, Integer, String, Table, text
 
 # If running locally, load environment variables from .env
 if os.environ.get("VERCEL") != "1":

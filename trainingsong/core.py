@@ -1,12 +1,12 @@
 """Entry point"""
 
-from typing import Union, List, Optional, Tuple, Dict, Any
-import webbrowser
-from threading import Thread
-import time
 import json
 import os
 import re
+import time
+import webbrowser
+from threading import Thread
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 import uvicorn
