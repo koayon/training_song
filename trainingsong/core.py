@@ -30,6 +30,7 @@ def _training_song(
     autoplay: Optional[bool] = True,
     verbose: Optional[bool] = True,
     email: Optional[str] = None,
+    metric: Optional[str] = "accuracy",
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Return the training song for a given percentage
     Outputs: (acc, response)"""
@@ -51,7 +52,7 @@ def _training_song(
     response = raw_response.json()
 
     if verbose:
-        print("Congrats your model got an accuracy of", p, "percent!")
+        print(f"Congrats your model's {metric} was ", p, "%!")
         if response and "song_info" in response:
             print(response["song_info"])
         else:
@@ -67,9 +68,10 @@ def _training_song(
 
 def ts(
     input_percentage: Union[float, List[float]],
-    chart="hot-100",
-    autoplay=True,
-    verbose=True,
+    chart: str = "hot-100",
+    autoplay: bool = True,
+    verbose: bool = True,
+    metric: str = "accuracy",
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Training song function.
     Starts a local server to capture the auth code from spotify and returns the song for your training accuracy.
@@ -119,7 +121,12 @@ def ts(
 
     # now we can call the training_song function with the captured OAuth code
     acc, response = _training_song(
-        accuracy, chart=chart, autoplay=autoplay, verbose=verbose, email=email
+        accuracy,
+        chart=chart,
+        autoplay=autoplay,
+        verbose=verbose,
+        email=email,
+        metric=metric,
     )
     return acc, response
 
@@ -169,7 +176,8 @@ def _get_email():
     return email_dict["email"]
 
 
-def _check_email(email):
+def _check_email(email: str) -> str:
+    "Returns truthy string if email is in db"
     response = requests.get(URL + "/email_in_db", params={"email": email})
     return response.json()["present_in_db"]
 
