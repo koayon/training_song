@@ -12,16 +12,7 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-PROD_API = True
-
-OAUTH_CODE = None
-if PROD_API:
-    URL = "https://training-song-api.vercel.app"
-else:
-    URL = "https://training-song-api-koayon.vercel.app"
-
-AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813dbf19d8b20608&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Flocal_callback&scope=user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"
-LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
+from .utils import AUTH_URL, OAUTH_CODE, URL
 
 
 def _training_song(
@@ -105,7 +96,6 @@ def ts(
             server_thread = Thread(target=_start_local_server)
             server_thread.start()
 
-            # open the authorization URL in a browser
             webbrowser.open(AUTH_URL)
 
             # wait for the user to authorize and for the server to capture the OAuth code
@@ -119,7 +109,6 @@ def ts(
         else input_percentage[-1]
     )
 
-    # now we can call the training_song function with the captured OAuth code
     acc, response = _training_song(
         accuracy,
         chart=chart,
