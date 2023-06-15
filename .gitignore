@@ -20,3 +20,4 @@ dist
 .pylintrc
 .DS_Store
 *.sql
+core.py.lprof

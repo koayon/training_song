@@ -1,6 +1,6 @@
 from urllib.parse import urlencode, urlunparse
 
-PROD_API = True
+PROD_API = False
 
 OAUTH_CODE = None
 if PROD_API:

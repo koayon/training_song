@@ -17,9 +17,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL is None:
     raise ValueError("DATABASE_URL environment variable not set or empty")
 
-database = databases.Database(DATABASE_URL)
+database = databases.Database(DATABASE_URL, min_size=5, max_size=10)
 metadata = sqlalchemy.MetaData()
-
 tokens = Table(
     "tokens",
     metadata,
