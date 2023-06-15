@@ -19,3 +19,4 @@ dist
 .vscode
 .pylintrc
 .DS_Store
+*.sql
