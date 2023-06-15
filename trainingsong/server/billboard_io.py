@@ -70,10 +70,8 @@ def get_number_one_song(
         days=target_day
     )
 
-    # Fetch the Billboard Hot 100 chart data for the target date
     chart_output = billboard.ChartData(chart, date=target_date)
 
-    # Get the Number 1 song on the chart
     if chart_output:
         number_one_song = chart_output[0]
     else:

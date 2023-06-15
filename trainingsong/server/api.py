@@ -53,9 +53,6 @@ async def root(
             )
         sp = await create_spotify_client(spotify_client_code, email)
     except HTTPException as e:
-        # raise HTTPException(
-        #     status_code=404, detail=f"str(e). Failed to created Spotify client"
-        # ) from e
         return {"errors": f"str(e). Failed to created Spotify client"}
 
     link, _name, uri = spotify_link(

@@ -60,7 +60,6 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
 
         if not token_info:
             print("Getting access token...")
-            # Get the access token
             if code is None:
                 raise ValueError("No code provided")
             try:
@@ -70,7 +69,6 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
             if not token_info:
                 raise HTTPException(status_code=400, detail="Invalid Spotify code")
 
-            # Put token info into sqlalchemy database
             await store_tokens(
                 email,
                 token_info["access_token"],
@@ -78,13 +76,11 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
                 token_info["expires_at"],
             )
 
-        # If the access token is expired, refresh it
         if token_info["expires_at"] < time.time():
             print("Refreshing access token...")
             token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
 
             if token_info:
-                # Put token info into sqlalchemy database
                 await update_tokens(
                     email,
                     token_info["access_token"],
@@ -98,7 +94,6 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
 
     print("Got access token!")
 
-    # Create a Spotify client with the access token
     sp = spotipy.Spotify(auth=access_token)
     print("Created Spotify client")
 

@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import databases
 import sqlalchemy
 from dotenv import load_dotenv
-from sqlalchemy import Column, Integer, String, Table, text
+from sqlalchemy import BigInteger, Column, String, Table, text
 
 # If running locally, load environment variables from .env
 if os.environ.get("VERCEL") != "1":
@@ -26,7 +26,7 @@ tokens = Table(
     Column("email", String, primary_key=True, unique=True),
     Column("access_token", String),
     Column("refresh_token", String),
-    Column("expires_at", Integer),
+    Column("expires_at", BigInteger),
 )
 
 engine = sqlalchemy.create_engine(DATABASE_URL)
@@ -63,7 +63,7 @@ async def delete_tokens(email: str) -> None:
 
 
 async def update_tokens(
-    email: str, access_token: str, refresh_token: str, expires_at: str
+    email: str, access_token: str, refresh_token: str, expires_at: int
 ) -> None:
     query = (
         tokens.update()
@@ -88,14 +88,6 @@ async def database_session():
 
 async def main():
     async with database_session():
-        # Test store_tokens and get_tokens
-        # create()
-
-        # await store_tokens("test", "test", "test", 1689727126)
-        # record = await get_tokens("test")
-        # if record:
-        #     print(record)
-        #     print(record.email)
         pass
 
 
