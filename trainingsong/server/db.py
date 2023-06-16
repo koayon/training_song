@@ -1,13 +1,13 @@
 """Database module for storing and retrieving user tokens from database."""
-
-import asyncio
 import os
-from contextlib import asynccontextmanager
+from contextlib import contextmanager
+from functools import lru_cache
 
-import databases
 import sqlalchemy
+from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-from sqlalchemy import BigInteger, Column, String, Table, text
+from sqlalchemy import BigInteger, Column, String, Table, create_engine
+from sqlalchemy.orm import sessionmaker
 
 # If running locally, load environment variables from .env
 if os.environ.get("VERCEL") != "1":
@@ -17,7 +17,15 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL is None:
     raise ValueError("DATABASE_URL environment variable not set or empty")
 
-database = databases.Database(DATABASE_URL, min_size=5, max_size=10)
+ENCRYPT_KEY = os.environ.get("ENCRYPT_KEY")
+if ENCRYPT_KEY is None:
+    raise ValueError("ENCRYPT_KEY environment variable not set or empty")
+else:
+    f = Fernet(ENCRYPT_KEY.encode())
+
+engine = create_engine(DATABASE_URL, future=True)
+Session = sessionmaker(bind=engine)
+
 metadata = sqlalchemy.MetaData()
 tokens = Table(
     "tokens",
@@ -28,67 +36,80 @@ tokens = Table(
     Column("expires_at", BigInteger),
 )
 
-engine = sqlalchemy.create_engine(DATABASE_URL)
 
-
-def create() -> None:
-    with engine.begin() as connection:
-        connection.execute(text("DROP TABLE IF EXISTS tokens"))
-    metadata.create_all(engine)
-
-
-async def store_tokens(
-    email: str, access_token: str, refresh_token: str, expires_at: int
-) -> None:
-    query = tokens.insert().values(
-        email=email,
-        access_token=access_token,
-        refresh_token=refresh_token,
-        expires_at=expires_at,
-    )
-    await database.execute(query)
-
-
-async def get_tokens(email: str):
-    # Return type is dictionary like. It's a Record object from databases
-    query = tokens.select().where(tokens.c.email == email)
-    result = await database.fetch_one(query)
-    return result
-
-
-async def delete_tokens(email: str) -> None:
-    query = tokens.delete().where(tokens.c.email == email)
-    await database.execute(query)
-
-
-async def update_tokens(
-    email: str, access_token: str, refresh_token: str, expires_at: int
-) -> None:
-    query = (
-        tokens.update()
-        .where(tokens.c.email == email)
-        .values(
-            access_token=access_token,
-            refresh_token=refresh_token,
+def store_tokens(email, access_token, refresh_token, expires_at, f=f):
+    with engine.connect() as connection:
+        query = tokens.insert().values(
+            email=email,
+            access_token=f.encrypt(access_token.encode()).decode(),
+            refresh_token=f.encrypt(refresh_token.encode()).decode(),
             expires_at=expires_at,
         )
-    )
-    await database.execute(query)
+        connection.execute(query)
+        connection.commit()
 
 
-@asynccontextmanager
-async def database_session():
-    await database.connect()
+@lru_cache(maxsize=1)
+def get_tokens(email):
+    with engine.connect() as connection:
+        query = tokens.select().where(tokens.c.email == email)
+        result = connection.execute(query).fetchone()
+        if result:
+            result = dict(result)
+            result["access_token"] = f.decrypt(result["access_token"]).decode()
+            result["refresh_token"] = f.decrypt(result["refresh_token"]).decode()
+        return result
+
+
+def update_tokens(email, access_token, refresh_token, expires_at, f=f):
+    with engine.connect() as connection:
+        query = (
+            tokens.update()
+            .where(tokens.c.email == email)
+            .values(
+                access_token=f.encrypt(access_token).decode(),
+                refresh_token=f.encrypt(refresh_token).decode(),
+                expires_at=expires_at,
+            )
+        )
+        connection.execute(query)
+        connection.commit()
+
+
+def delete_tokens(email):
+    with engine.connect() as connection:
+        query = tokens.delete().where(tokens.c.email == email)
+        connection.execute(query)
+        connection.commit()
+
+
+def create():
+    check = input("Are you sure you want to drop the database? (y/n) ")
+    if check != "y":
+        return print("Aborting")
+
+    with engine.connect() as connection:
+        connection.execute(sqlalchemy.text("DROP TABLE IF EXISTS tokens"))
+    metadata.create_all(engine)
+    print("Created fresh database")
+
+
+@contextmanager
+def database_session():
+    session = Session()
     try:
-        yield
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
     finally:
-        await database.disconnect()
+        session.close()
 
 
-async def main():
-    async with database_session():
-        pass
+def main():
+    pass
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
