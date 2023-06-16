@@ -4,10 +4,11 @@ from contextlib import contextmanager
 from functools import lru_cache
 
 import sqlalchemy
-from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from sqlalchemy import BigInteger, Column, String, Table, create_engine
 from sqlalchemy.orm import sessionmaker
+
+from trainingsong.server.db_utils import decrypt, encrypt
 
 # If running locally, load environment variables from .env
 if os.environ.get("VERCEL") != "1":
@@ -16,12 +17,6 @@ if os.environ.get("VERCEL") != "1":
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL is None:
     raise ValueError("DATABASE_URL environment variable not set or empty")
-
-ENCRYPT_KEY = os.environ.get("ENCRYPT_KEY")
-if ENCRYPT_KEY is None:
-    raise ValueError("ENCRYPT_KEY environment variable not set or empty")
-else:
-    f = Fernet(ENCRYPT_KEY.encode())
 
 engine = create_engine(DATABASE_URL, future=True)
 Session = sessionmaker(bind=engine)
@@ -41,8 +36,8 @@ def store_tokens(email, access_token, refresh_token, expires_at, f=f):
     with engine.connect() as connection:
         query = tokens.insert().values(
             email=email,
-            access_token=f.encrypt(access_token.encode()).decode(),
-            refresh_token=f.encrypt(refresh_token.encode()).decode(),
+            access_token=encrypt(access_token),
+            refresh_token=encrypt(refresh_token),
             expires_at=expires_at,
         )
         connection.execute(query)
@@ -56,10 +51,8 @@ def get_tokens(email):
         result = connection.execute(query).fetchone()
         if result:
             result = dict(result)
-            result["access_token"] = f.decrypt(result["access_token"].encode()).decode()
-            result["refresh_token"] = f.decrypt(
-                result["refresh_token"].encode()
-            ).decode()
+            result["access_token"] = decrypt(result["access_token"])
+            result["refresh_token"] = decrypt(result["refresh_token"])
         return result
 
 
@@ -69,8 +62,8 @@ def update_tokens(email, access_token, refresh_token, expires_at, f=f):
             tokens.update()
             .where(tokens.c.email == email)
             .values(
-                access_token=f.encrypt(access_token.encode()).decode(),
-                refresh_token=f.encrypt(refresh_token.encode()).decode(),
+                access_token=encrypt(access_token),
+                refresh_token=encrypt(refresh_token),
                 expires_at=expires_at,
             )
         )
