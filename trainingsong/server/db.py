@@ -32,7 +32,7 @@ tokens = Table(
 )
 
 
-def store_tokens(email, access_token, refresh_token, expires_at, f=f):
+def store_tokens(email, access_token, refresh_token, expires_at):
     with engine.connect() as connection:
         query = tokens.insert().values(
             email=email,
@@ -56,7 +56,7 @@ def get_tokens(email):
         return result
 
 
-def update_tokens(email, access_token, refresh_token, expires_at, f=f):
+def update_tokens(email, access_token, refresh_token, expires_at):
     with engine.connect() as connection:
         query = (
             tokens.update()
