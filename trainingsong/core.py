@@ -100,7 +100,7 @@ def ts(
 
             # wait for the user to authorize and for the server to capture the OAuth code
             while not OAUTH_CODE:
-                time.sleep(1)
+                time.sleep(0.5)
 
     # if the input percentage is a list, we want to take the final value
     accuracy = (
@@ -117,6 +117,13 @@ def ts(
         email=email,
         metric=metric,
     )
+    if not email_in_db:
+        print(
+            """Thanks for using Training Song!
+            For your first time, we used a local server to listen for your Spotify authorisation code.
+            You can exit this process now.
+            For future uses an access token is stored securely."""
+        )
     return acc, response
 
 
@@ -168,7 +175,10 @@ def _get_email():
 def _check_email(email: str) -> str:
     "Returns truthy string if email is in db"
     response = requests.get(URL + "/email_in_db", params={"email": email})
-    return response.json()["present_in_db"]
+    if response and (response.status_code == 200):
+        return response.json()["present_in_db"]
+    else:
+        raise ValueError("Error checking email")
 
 
 if __name__ == "__main__":
