@@ -49,15 +49,17 @@ def store_tokens(email, access_token, refresh_token, expires_at, f=f):
         connection.commit()
 
 
-@lru_cache(maxsize=1)
+# @lru_cache(maxsize=1)
 def get_tokens(email):
     with engine.connect() as connection:
         query = tokens.select().where(tokens.c.email == email)
         result = connection.execute(query).fetchone()
         if result:
             result = dict(result)
-            result["access_token"] = f.decrypt(result["access_token"]).decode()
-            result["refresh_token"] = f.decrypt(result["refresh_token"]).decode()
+            result["access_token"] = f.decrypt(result["access_token"].encode()).decode()
+            result["refresh_token"] = f.decrypt(
+                result["refresh_token"].encode()
+            ).decode()
         return result
 
 
@@ -67,12 +69,12 @@ def update_tokens(email, access_token, refresh_token, expires_at, f=f):
             tokens.update()
             .where(tokens.c.email == email)
             .values(
-                access_token=f.encrypt(access_token).decode(),
-                refresh_token=f.encrypt(refresh_token).decode(),
+                access_token=f.encrypt(access_token.encode()).decode(),
+                refresh_token=f.encrypt(refresh_token.encode()).decode(),
                 expires_at=expires_at,
             )
         )
-        connection.execute(query)
+        execute = connection.execute(query)
         connection.commit()
 
 
@@ -97,14 +99,17 @@ def create():
 @contextmanager
 def database_session():
     session = Session()
+    full_db = None
     try:
         yield session
         session.commit()
+        full_db = session.query(tokens).limit(5).all()
     except:
         session.rollback()
         raise
     finally:
         session.close()
+        # print(full_db)
 
 
 def main():
