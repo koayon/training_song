@@ -97,9 +97,9 @@ async def hello():
 
 @app.get("/email_in_db")
 async def email_in_db(email: str) -> Dict[str, str]:
-    async with database_session() as session:
-        result = await get_tokens(email)
-    return {"present_in_db": "" if result is None else "True"}
+    with database_session() as session:
+        result = get_tokens(email)
+    return {"present_in_db": ("" if result is None else "True")}
 
 
 def attempt_play(sp, uri) -> str:

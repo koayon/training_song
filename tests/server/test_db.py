@@ -10,7 +10,6 @@ from trainingsong.server import db
 
 load_dotenv()
 
-
 # @responses.activate
 # @pytest.mark.asyncio
 # async def test_get_tokens():
@@ -42,19 +41,18 @@ def setup_test_db():
     yield
 
 
-@pytest.mark.asyncio
-async def test_store_tokens(setup_test_db):
+def test_store_tokens(setup_test_db):
     email = "test@example.com"
     access_token = "access_token"
     refresh_token = "refresh_token"
     expires_at = 1689727126
 
-    async with db.database_session():
-        await db.store_tokens(email, access_token, refresh_token, expires_at)
+    with db.database_session():
+        db.store_tokens(email, access_token, refresh_token, expires_at)
 
     # Assert tokens were stored
-    async with db.database_session():
-        result = await db.get_tokens(email)
+    with db.database_session():
+        result = db.get_tokens(email)
         if result:
             assert result["email"] == email
             assert result["access_token"] == access_token
@@ -64,19 +62,18 @@ async def test_store_tokens(setup_test_db):
             assert False
 
 
-@pytest.mark.asyncio
-async def test_update_tokens(setup_test_db):
+def test_update_tokens(setup_test_db):
     email = "test@example.com"
     access_token = "new_access_token"
     refresh_token = "new_refresh_token"
     expires_at = 689727126
 
-    async with db.database_session():
-        await db.update_tokens(email, access_token, refresh_token, expires_at)
+    with db.database_session():
+        db.update_tokens(email, access_token, refresh_token, expires_at)
 
     # Assert tokens were updated
-    async with db.database_session():
-        result = await db.get_tokens(email)
+    with db.database_session():
+        result = db.get_tokens(email)
         if result:
             assert result["email"] == email
             assert result["access_token"] == access_token
@@ -86,14 +83,13 @@ async def test_update_tokens(setup_test_db):
             assert False
 
 
-@pytest.mark.asyncio
-async def test_delete_tokens(setup_test_db):
+def test_delete_tokens(setup_test_db):
     email = "test@example.com"
 
-    async with db.database_session():
-        await db.delete_tokens(email)
+    with db.database_session():
+        db.delete_tokens(email)
 
     # Assert tokens were deleted
-    async with db.database_session():
-        result = await db.get_tokens(email)
+    with db.database_session():
+        result = db.get_tokens(email)
         assert result is None

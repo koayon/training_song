@@ -12,7 +12,7 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-from .ts_utils import AUTH_URL, OAUTH_CODE, URL
+from trainingsong.ts_utils import AUTH_URL, OAUTH_CODE, URL
 
 
 def _training_song(
@@ -168,7 +168,6 @@ def _get_email():
 def _check_email(email: str) -> str:
     "Returns truthy string if email is in db"
     response = requests.get(URL + "/email_in_db", params={"email": email})
-    print(response)
     return response.json()["present_in_db"]
 
 

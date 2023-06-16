@@ -55,8 +55,8 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
         scope=SCOPE,
     )
 
-    async with database_session() as session:
-        token_info = await get_tokens(email)
+    with database_session() as session:
+        token_info = get_tokens(email)
 
         if not token_info:
             print("Getting access token...")
@@ -69,7 +69,7 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
             if not token_info:
                 raise HTTPException(status_code=400, detail="Invalid Spotify code")
 
-            await store_tokens(
+            store_tokens(
                 email,
                 token_info["access_token"],
                 token_info["refresh_token"],
@@ -81,7 +81,7 @@ async def create_spotify_client(code: Union[str, None], email: str) -> spotipy.S
             token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
 
             if token_info:
-                await update_tokens(
+                update_tokens(
                     email,
                     token_info["access_token"],
                     token_info["refresh_token"],
