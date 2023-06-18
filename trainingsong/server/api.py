@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Query
 
 from trainingsong.server.billboard_io import get_billboard_data
 from trainingsong.server.db import database_session, get_tokens
+from trainingsong.server.hard_coded import hard_coded_song
 from trainingsong.server.spotify import (
     create_spotify_client,
     spotify_link,
@@ -32,11 +33,20 @@ async def root(
     print(f"chart: {chart}")
     print(f"autoplay: {autoplay}")
 
-    try:
-        song_results = get_billboard_data(p, chart)
-        song_results.autoplay = autoplay
-    except HTTPException as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
+    if p < 1:
+        # Turn a decimal into a percentage
+        p *= 100
+
+    if p < 52:
+        song_results = hard_coded_song(p)
+        song_results.chart = chart
+    else:
+        try:
+            song_results = get_billboard_data(p, chart)
+        except HTTPException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+
+    song_results.autoplay = autoplay
 
     if not spotify_client_code and not email:
         raise HTTPException(status_code=400, detail="Missing Spotify code and email")

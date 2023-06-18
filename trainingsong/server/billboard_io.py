@@ -26,9 +26,6 @@ def get_billboard_data(
     """Call Billboard API and get the song name, artist name and song info"""
     if percentage > 100 or percentage < 0:
         raise ValueError("Please enter a percentage between 0 and 100")
-    if percentage < 1:
-        # Turn a decimal into a percentage
-        percentage *= 100
 
     try:
         number_one_song, target_date = get_number_one_song(percentage, chart)
