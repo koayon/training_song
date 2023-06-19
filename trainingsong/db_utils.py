@@ -9,10 +9,8 @@ if os.environ.get("VERCEL") != "1":
 
 ENCRYPT_KEY = os.environ.get("ENCRYPT_KEY")
 if ENCRYPT_KEY is None:
-    # raise ValueError("ENCRYPT_KEY environment variable not set or empty")
-    f = Fernet(Fernet.generate_key())
-else:
-    f = Fernet(ENCRYPT_KEY.encode())
+    ENCRYPT_KEY = "mock_key"
+f = Fernet(ENCRYPT_KEY.encode())
 
 
 def encrypt(string):

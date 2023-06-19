@@ -3,13 +3,15 @@ import os
 import pytest
 from dotenv import load_dotenv
 
+from trainingsong.db_utils import ENCRYPT_KEY
 from trainingsong.server import db
 
 load_dotenv()
 
 
-@pytest.skip("Skipping db tests")
 def test_tokens():
+    if ENCRYPT_KEY == "mock_key":
+        pytest.skip("Skipping db tests")
     # Test storing tokens
     EMAIL = "test@example.com"
 
