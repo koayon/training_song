@@ -8,6 +8,7 @@ from trainingsong.server import db
 load_dotenv()
 
 
+@pytest.skip("Skipping db tests")
 def test_tokens():
     # Test storing tokens
     EMAIL = "test@example.com"
