@@ -1,27 +1,18 @@
 """Entry point"""
 
-from typing import Union, List, Optional, Tuple, Dict, Any, NamedTuple
-import webbrowser
-from threading import Thread
-import time
 import json
 import os
 import re
+import time
+import webbrowser
+from threading import Thread
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 import uvicorn
 from fastapi import FastAPI, Request
 
-PROD_API = True
-
-OAUTH_CODE = None
-if PROD_API:
-    URL = "https://training-song-api.vercel.app"
-else:
-    URL = "https://training-song-api-koayon.vercel.app"
-
-AUTH_URL = "https://accounts.spotify.com/authorize?client_id=4259770654fb4353813dbf19d8b20608&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Flocal_callback&scope=user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"
-LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
+from trainingsong.ts_utils import AUTH_URL, OAUTH_CODE, URL
 
 
 def _training_song(
@@ -30,6 +21,7 @@ def _training_song(
     autoplay: Optional[bool] = True,
     verbose: Optional[bool] = True,
     email: Optional[str] = None,
+    metric: Optional[str] = "accuracy",
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Return the training song for a given percentage
     Outputs: (acc, response)"""
@@ -51,7 +43,7 @@ def _training_song(
     response = raw_response.json()
 
     if verbose:
-        print("Congrats your model got an accuracy of", p, "percent!")
+        print(f"Congrats your model's {metric} was ", p, "%!")
         if response and "song_info" in response:
             print(response["song_info"])
         else:
@@ -67,9 +59,10 @@ def _training_song(
 
 def ts(
     input_percentage: Union[float, List[float]],
-    chart="hot-100",
-    autoplay=True,
-    verbose=True,
+    chart: str = "hot-100",
+    autoplay: bool = True,
+    verbose: bool = True,
+    metric: str = "accuracy",
 ) -> Tuple[Union[float, List[float], None], Dict[str, Any]]:
     """Training song function.
     Starts a local server to capture the auth code from spotify and returns the song for your training accuracy.
@@ -103,12 +96,11 @@ def ts(
             server_thread = Thread(target=_start_local_server)
             server_thread.start()
 
-            # open the authorization URL in a browser
             webbrowser.open(AUTH_URL)
 
             # wait for the user to authorize and for the server to capture the OAuth code
             while not OAUTH_CODE:
-                time.sleep(1)
+                time.sleep(0.5)
 
     # if the input percentage is a list, we want to take the final value
     accuracy = (
@@ -117,10 +109,23 @@ def ts(
         else input_percentage[-1]
     )
 
-    # now we can call the training_song function with the captured OAuth code
     acc, response = _training_song(
-        accuracy, chart=chart, autoplay=autoplay, verbose=verbose, email=email
+        accuracy,
+        chart=chart,
+        autoplay=autoplay,
+        verbose=verbose,
+        email=email,
+        metric=metric,
     )
+    if not email_in_db:
+        print(
+            """
+
+Thanks for using Training Song!
+For your first time, we used a local server to listen for your Spotify authorisation code.
+You can exit this process now.
+For future uses an access token is stored securely."""
+        )
     return acc, response
 
 
@@ -169,9 +174,13 @@ def _get_email():
     return email_dict["email"]
 
 
-def _check_email(email):
+def _check_email(email: str) -> str:
+    "Returns truthy string if email is in db"
     response = requests.get(URL + "/email_in_db", params={"email": email})
-    return response.json()["present_in_db"]
+    if response and (response.status_code == 200):
+        return response.json()["present_in_db"]
+    else:
+        raise ValueError("Error checking email")
 
 
 if __name__ == "__main__":

@@ -19,3 +19,6 @@ dist
 .vscode
 .pylintrc
 .DS_Store
+*.sql
+*.lprof
+test.db

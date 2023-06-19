@@ -1,11 +1,11 @@
 "Billboard API calls and data processing"
 
 import datetime
-from typing import Tuple
 from dataclasses import dataclass
+from typing import Tuple
 
-from fastapi import HTTPException
 import billboard
+from fastapi import HTTPException
 
 from trainingsong.server.spotify import StateData
 
@@ -26,9 +26,6 @@ def get_billboard_data(
     """Call Billboard API and get the song name, artist name and song info"""
     if percentage > 100 or percentage < 0:
         raise ValueError("Please enter a percentage between 0 and 100")
-    if percentage < 1:
-        # Turn a decimal into a percentage
-        percentage *= 100
 
     try:
         number_one_song, target_date = get_number_one_song(percentage, chart)
@@ -70,10 +67,8 @@ def get_number_one_song(
         days=target_day
     )
 
-    # Fetch the Billboard Hot 100 chart data for the target date
     chart_output = billboard.ChartData(chart, date=target_date)
 
-    # Get the Number 1 song on the chart
     if chart_output:
         number_one_song = chart_output[0]
     else:

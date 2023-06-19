@@ -1,45 +1,67 @@
-import json
-import responses
+import os
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock
+from dotenv import load_dotenv
 
-from trainingsong.server.db import (
-    get_tokens,
-    store_tokens,
-    update_tokens,
-    delete_tokens,
-    database,
-)
+from trainingsong.server import db
+
+load_dotenv()
 
 
-@responses.activate
-@pytest.mark.asyncio
-async def test_get_tokens():
-    test_request_payload = "test123@gmail.com"
-    test_response_payload = {
-        "email": "test123@gmail.com",
-        "access_token": "foo",
-        "refresh_token": "bar",
-        "expires_at": 42,
-    }
+@pytest.mark.skip(reason="Skip for gh actions")
+def test_tokens():
+    # Test storing tokens
+    EMAIL = "test@example.com"
 
-    responses.add(
-        responses.GET,
-        "https://training-song-api-koayon.vercel.app",
-        json=test_response_payload,
-        status=200,
-    )
+    # Setup
+    with db.database_session():
+        db.delete_tokens(EMAIL)
 
-    # Mock the database object and its fetch_one method
-    database_mock = MagicMock()
-    database.fetch_one = AsyncMock(return_value=test_response_payload)
+    ACCESS_TOKEN = "access_token"
+    REFRESH_TOKEN = "refresh_token"
+    EXPIRES_AT = 1689727126
 
-    # Call the function with the test inputs
-    response = await get_tokens(test_request_payload)
+    with db.database_session():
+        db.store_tokens(EMAIL, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_AT)
 
-    # Verify the function returned the expected result
-    assert response == test_response_payload
+    # Assert tokens were stored
+    with db.database_session():
+        result = db.get_tokens(EMAIL)
+        if result:
+            assert result["email"] == EMAIL
+            assert result["access_token"] == ACCESS_TOKEN
+            assert result["refresh_token"] == REFRESH_TOKEN
+            assert result["expires_at"] == EXPIRES_AT
+        else:
+            assert False
 
-    # Verify fetch_one was called with the expected query
-    database.fetch_one.assert_called_once()
+    ###########################################################
+    # Test updating tokens
+    NEW_ACCESS_TOKEN = "new_access_token"
+    NEW_REFRESH_TOKEN = "new_refresh_token"
+    NEW_EXPIRES_AT = 689727129
+
+    with db.database_session():
+        db.update_tokens(EMAIL, NEW_ACCESS_TOKEN, NEW_REFRESH_TOKEN, NEW_EXPIRES_AT)
+
+    # Assert tokens were updated
+    with db.database_session():
+        result = db.get_tokens(EMAIL)
+        if result:
+            assert result["email"] == EMAIL
+            assert result["access_token"] == NEW_ACCESS_TOKEN
+            assert result["refresh_token"] == NEW_REFRESH_TOKEN
+            assert result["expires_at"] == NEW_EXPIRES_AT
+        else:
+            assert False
+
+    ###########################################################
+    # Test deleting tokens
+
+    with db.database_session():
+        db.delete_tokens(EMAIL)
+
+    # Assert tokens were deleted
+    with db.database_session():
+        result = db.get_tokens(EMAIL)
+        assert result is None

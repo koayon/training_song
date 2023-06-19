@@ -1,11 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
 import responses
-from trainingsong.core import (
-    local_app,
-    _training_song,
-    _is_valid_email,
-)
+from fastapi.testclient import TestClient
+
+from trainingsong.core import _is_valid_email, _training_song, local_app
+from trainingsong.ts_utils import URL
 
 client = TestClient(local_app)
 
@@ -23,7 +21,7 @@ def test_is_valid_email():
 def test_training_song():
     responses.add(
         responses.GET,
-        "https://training-song-api.vercel.app",
+        URL,
         json={"song_info": "mock song info"},
         status=200,
     )

@@ -2,18 +2,18 @@
 Main API file.
 """
 
-from typing import Union, Dict
-import webbrowser
+from typing import Dict, Union
 
 from fastapi import FastAPI, HTTPException, Query
 
 from trainingsong.server.billboard_io import get_billboard_data
+from trainingsong.server.db import database_session, get_tokens
+from trainingsong.server.hard_coded import hard_coded_song
 from trainingsong.server.spotify import (
     create_spotify_client,
     spotify_link,
     start_playback,
 )
-from trainingsong.server.db import get_tokens, database_session
 
 app = FastAPI()
 
@@ -33,11 +33,20 @@ async def root(
     print(f"chart: {chart}")
     print(f"autoplay: {autoplay}")
 
-    try:
-        song_results = get_billboard_data(p, chart)
-        song_results.autoplay = autoplay
-    except HTTPException as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
+    if p < 1:
+        # Turn a decimal into a percentage
+        p *= 100
+
+    if p < 52:
+        song_results = hard_coded_song(p, chart)
+        song_results.chart = chart
+    else:
+        try:
+            song_results = get_billboard_data(p, chart)
+        except HTTPException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+
+    song_results.autoplay = autoplay
 
     if not spotify_client_code and not email:
         raise HTTPException(status_code=400, detail="Missing Spotify code and email")
@@ -54,9 +63,6 @@ async def root(
             )
         sp = await create_spotify_client(spotify_client_code, email)
     except HTTPException as e:
-        # raise HTTPException(
-        #     status_code=404, detail=f"str(e). Failed to created Spotify client"
-        # ) from e
         return {"errors": f"str(e). Failed to created Spotify client"}
 
     link, _name, uri = spotify_link(
@@ -70,7 +76,7 @@ async def root(
     if autoplay:
         errors = attempt_play(sp, uri)
         if errors:
-            errors += "Failed to start playback"
+            errors += " Failed to start playback"
             open_link = "True"
     else:
         errors = ""
@@ -100,10 +106,10 @@ async def hello():
 
 
 @app.get("/email_in_db")
-async def email_in_db(email: str) -> Dict[str, bool]:
-    async with database_session() as session:
-        result = await get_tokens(email)
-    return {"present_in_db": result is not None}
+async def email_in_db(email: str) -> Dict[str, str]:
+    with database_session() as session:
+        result = get_tokens(email)
+    return {"present_in_db": ("" if result is None else "True")}
 
 
 def attempt_play(sp, uri) -> str:
