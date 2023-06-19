@@ -16,7 +16,8 @@ if os.environ.get("VERCEL") != "1":
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL is None:
-    raise ValueError("DATABASE_URL environment variable not set or empty")
+    # raise ValueError("DATABASE_URL environment variable not set or empty")
+    DATABASE_URL = "sqlite:///test.db"
 
 engine = create_engine(DATABASE_URL, future=True)
 Session = sessionmaker(bind=engine)

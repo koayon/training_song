@@ -3,14 +3,13 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from trainingsong.db_utils import ENCRYPT_KEY
 from trainingsong.server import db
 
 load_dotenv()
 
 
 def test_tokens():
-    if ENCRYPT_KEY == "mock_key":
+    if db.DATABASE_URL == "sqlite:///test.db":
         pytest.skip("Skipping db tests")
     # Test storing tokens
     EMAIL = "test@example.com"
@@ -67,7 +66,3 @@ def test_tokens():
     with db.database_session():
         result = db.get_tokens(EMAIL)
         assert result is None
-
-
-def test_test():
-    assert True
