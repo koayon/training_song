@@ -13,7 +13,7 @@ LOCAL_REDIRECT_URI = "http://localhost:8000/local_callback"
 CLIENT_ID = "4259770654fb4353813dbf19d8b20608"
 
 AUTH_BASE = "https://accounts.spotify.com/authorize"
-SCOPE = "user-modify-playback-state+user-read-currently-playing+user-read-recently-played+user-read-playback-state"
+SCOPE = "user-modify-playback-state user-read-currently-playing user-read-recently-played user-read-playback-state"
 query = urlencode(
     {
         "client_id": CLIENT_ID,

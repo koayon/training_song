@@ -38,7 +38,7 @@ async def root(
         p *= 100
 
     if p < 52:
-        song_results = hard_coded_song(p)
+        song_results = hard_coded_song(p, chart)
         song_results.chart = chart
     else:
         try:
@@ -76,7 +76,7 @@ async def root(
     if autoplay:
         errors = attempt_play(sp, uri)
         if errors:
-            errors += "Failed to start playback"
+            errors += " Failed to start playback"
             open_link = "True"
     else:
         errors = ""

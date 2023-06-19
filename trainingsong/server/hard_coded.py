@@ -1,7 +1,7 @@
 from trainingsong.server.spotify import StateData
 
 
-def hard_coded_song(percentage):
+def hard_coded_song(percentage, chart):
     # return get_billboard_data(p, "hot-100")
     p = int(percentage)
     if p in HARD_CODED_DICT:
@@ -15,7 +15,7 @@ def hard_coded_song(percentage):
         song_name=song_name,
         artist_name=artist_name,
         autoplay=None,
-        song_info=f"Your results were before the Billboard Hot 100 chart started in 1952. Here's {song_name} by {artist_name} instead.",
+        song_info=f"Your results were before the {chart} chart started in {CHART_START_YEAR}. Here's {song_name} by {artist_name} instead.",
         target_date="",
         percentage=percentage,
         chart="",
@@ -35,3 +35,5 @@ HARD_CODED_DICT = {
     24: ["24K Magic", "Bruno Mars"],
     42: ["42", "Coldplay"],
 }
+
+CHART_START_YEAR = 1952

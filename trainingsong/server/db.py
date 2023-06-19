@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from sqlalchemy import BigInteger, Column, String, Table, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from trainingsong.server.db_utils import decrypt, encrypt
+from trainingsong.db_utils import decrypt, encrypt
 
 # If running locally, load environment variables from .env
 if os.environ.get("VERCEL") != "1":

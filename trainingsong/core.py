@@ -119,10 +119,12 @@ def ts(
     )
     if not email_in_db:
         print(
-            """Thanks for using Training Song!
-            For your first time, we used a local server to listen for your Spotify authorisation code.
-            You can exit this process now.
-            For future uses an access token is stored securely."""
+            """
+
+Thanks for using Training Song!
+For your first time, we used a local server to listen for your Spotify authorisation code.
+You can exit this process now.
+For future uses an access token is stored securely."""
         )
     return acc, response
 
