@@ -379,23 +379,26 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "databases"
-version = "0.5.5"
+version = "0.8.0"
 description = "Async database support for Python."
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "databases-0.5.5-py3-none-any.whl", hash = "sha256:97d9b9647216d1ab53ca61c059412b5c7b6e1f0bf8ce985477982ebcc7f278f3"},
-    {file = "databases-0.5.5.tar.gz", hash = "sha256:02c6b016c1c951c21cca281dc8e2e002c60dc44026c0084aabbd8c37514aeb37"},
+    {file = "databases-0.8.0-py3-none-any.whl", hash = "sha256:0ceb7fd5c740d846e1f4f58c0256d780a6786841ec8e624a21f1eb1b51a9093d"},
+    {file = "databases-0.8.0.tar.gz", hash = "sha256:6544d82e9926f233d694ec29cd018403444c7fb6e863af881a8304d1ff5cfb90"},
 ]
 
 [package.dependencies]
-sqlalchemy = ">=1.4,<1.5"
+sqlalchemy = ">=1.4.42,<1.5"
 
 [package.extras]
+aiomysql = ["aiomysql"]
+aiopg = ["aiopg"]
+aiosqlite = ["aiosqlite"]
+asyncmy = ["asyncmy"]
+asyncpg = ["asyncpg"]
 mysql = ["aiomysql"]
-mysql-asyncmy = ["asyncmy"]
 postgresql = ["asyncpg"]
-postgresql-aiopg = ["aiopg"]
 sqlite = ["aiosqlite"]
 
 [[package]]
@@ -1328,4 +1331,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "10f382b27ae0a5095de58b54263254a7a55aeda0636e270ffb677da9f08798b1"
+content-hash = "46079fcd41f070d96b0b828a3f77150acd1949173070bf5c741323a7508087f9"
