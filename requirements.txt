@@ -2,7 +2,7 @@ fastapi == 0.95.1
 spotipy == 2.23.0
 billboard-py == 7.0.0
 uvicorn == 0.23.2
-databases==0.5.2
+databases==0.8.0
 sqlalchemy==1.4.49
 python-dotenv==0.19.1
 asyncpg==0.28.0
