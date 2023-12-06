@@ -1,4 +1,4 @@
-fastapi == 0.95.1
+fastapi == 0.104.1
 spotipy == 2.23.0
 billboard-py == 7.0.0
 uvicorn == 0.24.0.post1
