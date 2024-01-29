@@ -4,7 +4,7 @@ billboard-py == 7.0.0
 uvicorn == 0.25.0
 databases==0.8.0
 sqlalchemy==1.4.51
-python-dotenv==0.19.1
+python-dotenv==1.0.1
 asyncpg==0.29.0
 psycopg2-binary~=2.9.3
 cryptography==41.0.7
