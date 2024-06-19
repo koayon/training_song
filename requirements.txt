@@ -1,7 +1,7 @@
 fastapi == 0.106.0
 spotipy == 2.23.0
 billboard-py == 7.0.1
-uvicorn == 0.29.0
+uvicorn == 0.30.1
 databases==0.8.0
 sqlalchemy==1.4.52
 python-dotenv==1.0.1
