@@ -123,12 +123,12 @@ lxml = ["lxml"]
 
 [[package]]
 name = "billboard-py"
-version = "7.0.1"
+version = "7.1.0"
 description = "Python API for downloading Billboard charts"
 optional = false
 python-versions = "*"
 files = [
-    {file = "billboard.py-7.0.1-py2.py3-none-any.whl", hash = "sha256:a558be223e85ad7969162dd973c95dc792091921e497a582d9bb1a6e268761b6"},
+    {file = "billboard.py-7.1.0-py2.py3-none-any.whl", hash = "sha256:e15b6898fe8c1447d753853456929495b46082188016d38f75b7cb673ba76624"},
 ]
 
 [package.dependencies]
